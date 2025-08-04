@@ -6,6 +6,8 @@ import {
   ButtonBuilder,
   ButtonStyle,
   escapeMarkdown,
+  hyperlink,
+  inlineCode,
   MessageFlags,
   SectionBuilder,
   TextDisplayBuilder,
@@ -26,9 +28,25 @@ import { envParseString } from "@skyra/env-utilities";
 import { type Nullish } from "@sapphire/utilities";
 import { extname } from "path";
 import { generateDataComponent } from "../../interaction-handlers/repo/updateCheck2.ts";
+import dedent from "dedent";
+import { assert } from "@std/assert";
 
 const ModInfo = z.array(z.object({ modid: z.string() }));
 const URL = z.string().check(z.url());
+
+const modsJson = hyperlink(
+  "mods.json",
+  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/mods.json",
+);
+const packsJson = hyperlink(
+  "packs.json",
+  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/packs.json",
+);
+const permsJson = hyperlink(
+  "update_perms.json",
+  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/update_perms.json",
+);
+const mistakeLine = "-# If you believe this to be a mistake, please make a PR";
 
 @ApplyOptions<Subcommand.Options>({
   description: "Updates a mod / pack",
@@ -114,18 +132,21 @@ export class UserCommand extends Subcommand {
     if (!perms.all && !Object.keys(perms.mods).length) {
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `${Emojis.YouWhat} you can't update any mods`,
+        content: dedent`
+          ${Emojis.YouWhat} You don't have any mod update perms
+          ${mistakeLine} in ${permsJson}
+        `,
       });
     }
 
     if (channel.id != SkyClient.channels.ModUpdating)
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `💡 this command is only available in <#${SkyClient.channels.ModUpdating}>`,
+        content: `💡 This command is only available in <#${SkyClient.channels.ModUpdating}>`,
       });
     const url = int.options.getString("url", true);
     if (!URL.safeParse(url).success)
-      return int.reply("this doesn't look like a URL to me 🤔");
+      return int.reply("This doesn't look like a URL to me 🤔");
 
     await int.deferReply();
 
@@ -160,10 +181,15 @@ export class UserCommand extends Subcommand {
     modId = modId || int.options.getString("forge_id");
 
     if (!modId) return int.editReply("🫨 Failed to find modid in mcmod.info!");
-    if (!(await hasPermission(member, "update", "mod", modId)))
-      return int.editReply(
-        `🫨 you aren't allowed to update \`${escapeMarkdown(modId)}\``,
-      );
+    if (!(await hasPermission(member, "update", "mod", modId))) {
+      assert(!perms.all);
+      return int.editReply(dedent`
+        🫨 You aren't allowed to update the mod \`${escapeMarkdown(modId)}\`
+        You can only update mods with the Forge modid of: \
+        ${Object.keys(perms.mods).map(inlineCode).join(", ")}
+        ${mistakeLine} in ${modsJson}
+      `);
+    }
 
     const isBeta = int.options.getBoolean("beta") || false;
     const data: ModUpdate = {
@@ -187,19 +213,23 @@ export class UserCommand extends Subcommand {
     const existingMod =
       mods.find((mod) => mod.forge_id == modId) ||
       modsRef.find((mod) => mod.forge_id == modId);
-    if (!existingMod) return int.editReply("🤔 that mod doesn't exist");
+    if (!existingMod)
+      return int.editReply(dedent`
+        🤔 Our database doesn't contain a mod with forge_id \`${escapeMarkdown(modId)}\`
+        ${mistakeLine} in ${modsJson}
+      `);
 
     if (
       existingMod.url == data.url &&
       existingMod.file == data.file &&
       existingMod.hash == data.hash
     )
-      return int.editReply("🤔 nothing to change");
+      return int.editReply("🤔 Nothing to change");
 
-    if (!extname(data.file)) return int.editReply("🤯 file extension required");
+    if (!extname(data.file)) return int.editReply("🤯 File extension required");
     if (extname(existingMod.file) != extname(data.file))
       return int.editReply(
-        `🤯 file extension changed! (\`${extname(existingMod.file)}\` -> \`${extname(data.file)}\`)`,
+        `🤯 File extension changed! (\`${extname(existingMod.file)}\` -> \`${extname(data.file)}\`)`,
       );
 
     const { id } = await int.fetchReply();
@@ -222,17 +252,20 @@ export class UserCommand extends Subcommand {
     if (!perms.all && !Object.keys(perms.packs).length)
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `${Emojis.YouWhat} you can't update any packs`,
+        content: dedent`
+          ${Emojis.YouWhat} You don't have any pack update perms
+          ${mistakeLine} in ${permsJson}
+        `,
       });
 
     if (channel.id != SkyClient.channels.ModUpdating)
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `💡 this command is only available in <#${SkyClient.channels.ModUpdating}>`,
+        content: `💡 This command is only available in <#${SkyClient.channels.ModUpdating}>`,
       });
     const url = int.options.getString("url", true);
     if (!URL.safeParse(url).success)
-      return int.reply("this doesn't look like a URL to me 🤔");
+      return int.reply("This doesn't look like a URL to me 🤔");
 
     await int.deferReply();
 
@@ -259,8 +292,15 @@ export class UserCommand extends Subcommand {
 
     const packId = int.options.getString("pack", true);
 
-    if (!(await hasPermission(member, "update", "pack", packId)))
-      return int.editReply(`🫨 you can't update that pack`);
+    if (!(await hasPermission(member, "update", "pack", packId))) {
+      assert(!perms.all);
+      return int.editReply(dedent`
+        🫨 You aren't allowed to update the pack \`${escapeMarkdown(packId)}\`
+        You can only update packs with the id of: \
+        ${Object.keys(perms.packs).map(inlineCode).join(", ")}
+        ${mistakeLine} in ${permsJson}
+      `);
+    }
 
     const data: PackUpdate = {
       type: "pack",
@@ -279,19 +319,23 @@ export class UserCommand extends Subcommand {
     const packs = await getPacks();
 
     const existingPack = packs.find((pack) => pack.id == packId);
-    if (!existingPack) return int.editReply("🤔 that pack doesn't exist");
+    if (!existingPack)
+      return int.editReply(dedent`
+        🤔 Our database doesn't contain a pack with id \`${escapeMarkdown(packId)}\`
+        ${mistakeLine} in ${packsJson}
+      `);
 
     if (
       existingPack.url == data.url &&
       existingPack.file == data.file &&
       existingPack.hash == data.hash
     )
-      return int.editReply("🤔 nothing to change");
+      return int.editReply("🤔 Nothing to change");
 
-    if (!extname(data.file)) return int.editReply("🤯 file extension required");
+    if (!extname(data.file)) return int.editReply("🤯 File extension required");
     if (extname(existingPack.file) != extname(data.file))
       return int.editReply(
-        `🤯 file extension changed! (\`${extname(existingPack.file)}\` -> \`${extname(data.file)}\`)`,
+        `🤯 File extension changed! (\`${extname(existingPack.file)}\` -> \`${extname(data.file)}\`)`,
       );
 
     const { id } = await int.fetchReply();
@@ -314,7 +358,7 @@ function retMessage(
       generateDataComponent(data),
       new SectionBuilder()
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent("👀 does this look alright?"),
+          new TextDisplayBuilder().setContent("👀 Does this look correct?"),
         )
         .setButtonAccessory(
           new ButtonBuilder()
