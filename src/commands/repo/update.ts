@@ -6,6 +6,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   escapeMarkdown,
+  hideLinkEmbed,
   hyperlink,
   inlineCode,
   MessageFlags,
@@ -36,15 +37,21 @@ const URL = z.string().check(z.url());
 
 const modsJson = hyperlink(
   "mods.json",
-  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/mods.json",
+  hideLinkEmbed(
+    "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/mods.json",
+  ),
 );
 const packsJson = hyperlink(
   "packs.json",
-  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/packs.json",
+  hideLinkEmbed(
+    "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/packs.json",
+  ),
 );
 const permsJson = hyperlink(
   "update_perms.json",
-  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/update_perms.json",
+  hideLinkEmbed(
+    "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/update_perms.json",
+  ),
 );
 const mistakeLine = "-# If you believe this to be a mistake, please make a PR";
 
@@ -142,11 +149,11 @@ export class UserCommand extends Subcommand {
     if (channel.id != SkyClient.channels.ModUpdating)
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `💡 This command is only available in <#${SkyClient.channels.ModUpdating}>`,
+        content: `${Emojis.Light} This command is only available in <#${SkyClient.channels.ModUpdating}>`,
       });
     const url = int.options.getString("url", true);
     if (!URL.safeParse(url).success)
-      return int.reply("This doesn't look like a URL to me 🤔");
+      return int.reply(`This doesn't look like a URL to me ${Emojis.Thinking}`);
 
     await int.deferReply();
 
@@ -180,11 +187,14 @@ export class UserCommand extends Subcommand {
     }
     modId = modId || int.options.getString("forge_id");
 
-    if (!modId) return int.editReply("🫨 Failed to find modid in mcmod.info!");
+    if (!modId)
+      return int.editReply(
+        `${Emojis.Shaking} Failed to find modid in mcmod.info!`,
+      );
     if (!(await hasPermission(member, "update", "mod", modId))) {
       assert(!perms.all);
       return int.editReply(dedent`
-        🫨 You aren't allowed to update the mod \`${escapeMarkdown(modId)}\`
+        ${Emojis.Shaking} You aren't allowed to update the mod \`${escapeMarkdown(modId)}\`
         You can only update mods with the Forge modid of: \
         ${Object.keys(perms.mods).map(inlineCode).join(", ")}
         ${mistakeLine} in ${modsJson}
@@ -215,7 +225,7 @@ export class UserCommand extends Subcommand {
       modsRef.find((mod) => mod.forge_id == modId);
     if (!existingMod)
       return int.editReply(dedent`
-        🤔 Our database doesn't contain a mod with forge_id \`${escapeMarkdown(modId)}\`
+        ${Emojis.Thinking} The database doesn't contain a mod with forge_id \`${escapeMarkdown(modId)}\`
         ${mistakeLine} in ${modsJson}
       `);
 
@@ -226,11 +236,13 @@ export class UserCommand extends Subcommand {
     )
       return int.editReply("🤔 Nothing to change");
 
-    if (!extname(data.file)) return int.editReply("🤯 File extension required");
+    if (!extname(data.file))
+      return int.editReply(`${Emojis.MindBlown} File extension required`);
     if (extname(existingMod.file) != extname(data.file))
-      return int.editReply(
-        `🤯 File extension changed! (\`${extname(existingMod.file)}\` -> \`${extname(data.file)}\`)`,
-      );
+      return int.editReply(dedent`
+        ${Emojis.MindBlown} File extension changed! \
+        (\`${extname(existingMod.file)}\` -> \`${extname(data.file)}\`)
+      `);
 
     const { id } = await int.fetchReply();
     await PendingUpdatesDB.update((pending) => {
@@ -261,11 +273,11 @@ export class UserCommand extends Subcommand {
     if (channel.id != SkyClient.channels.ModUpdating)
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `💡 This command is only available in <#${SkyClient.channels.ModUpdating}>`,
+        content: `${Emojis.Thinking} This command is only available in <#${SkyClient.channels.ModUpdating}>`,
       });
     const url = int.options.getString("url", true);
     if (!URL.safeParse(url).success)
-      return int.reply("This doesn't look like a URL to me 🤔");
+      return int.reply(`This doesn't look like a URL to me ${Emojis.Thinking}`);
 
     await int.deferReply();
 
@@ -295,7 +307,7 @@ export class UserCommand extends Subcommand {
     if (!(await hasPermission(member, "update", "pack", packId))) {
       assert(!perms.all);
       return int.editReply(dedent`
-        🫨 You aren't allowed to update the pack \`${escapeMarkdown(packId)}\`
+        ${Emojis.Thinking} You aren't allowed to update the pack \`${escapeMarkdown(packId)}\`
         You can only update packs with the id of: \
         ${Object.keys(perms.packs).map(inlineCode).join(", ")}
         ${mistakeLine} in ${permsJson}
@@ -321,7 +333,7 @@ export class UserCommand extends Subcommand {
     const existingPack = packs.find((pack) => pack.id == packId);
     if (!existingPack)
       return int.editReply(dedent`
-        🤔 Our database doesn't contain a pack with id \`${escapeMarkdown(packId)}\`
+        ${Emojis.Thinking} The database doesn't contain a pack with id \`${escapeMarkdown(packId)}\`
         ${mistakeLine} in ${packsJson}
       `);
 
@@ -330,13 +342,15 @@ export class UserCommand extends Subcommand {
       existingPack.file == data.file &&
       existingPack.hash == data.hash
     )
-      return int.editReply("🤔 Nothing to change");
+      return int.editReply(`${Emojis.Thinking} Nothing to change`);
 
-    if (!extname(data.file)) return int.editReply("🤯 File extension required");
+    if (!extname(data.file))
+      return int.editReply(`${Emojis.MindBlown} File extension required`);
     if (extname(existingPack.file) != extname(data.file))
-      return int.editReply(
-        `🤯 File extension changed! (\`${extname(existingPack.file)}\` -> \`${extname(data.file)}\`)`,
-      );
+      return int.editReply(dedent`
+        ${Emojis.MindBlown} File extension changed! \
+        (\`${extname(existingPack.file)}\` -> \`${extname(data.file)}\`)
+      `);
 
     const { id } = await int.fetchReply();
     await PendingUpdatesDB.update((pending) => {
@@ -358,7 +372,9 @@ function retMessage(
       generateDataComponent(data),
       new SectionBuilder()
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent("👀 Does this look correct?"),
+          new TextDisplayBuilder().setContent(
+            `${Emojis.Eyes} Does this look correct?`,
+          ),
         )
         .setButtonAccessory(
           new ButtonBuilder()

@@ -86,6 +86,12 @@ export const Emojis = {
   ...(Object.fromEntries(
     Object.entries(AEmojiIDs).map(([k, v]) => [k, formatEmoji(v, true)]),
   ) as Record<keyof typeof EmojiIDs, `<a:_:${string}>`>),
+
+  Thinking: "🤔",
+  Shaking: "🫨",
+  Light: "💡",
+  MindBlown: "🤯",
+  Eyes: "👀",
 };
 
 export const SupportTeams: Record<string, string> = {
