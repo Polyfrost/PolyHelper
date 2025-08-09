@@ -35,23 +35,17 @@ import { assert } from "@std/assert";
 const ModInfo = z.array(z.object({ modid: z.string() }));
 const URL = z.url();
 
-const modsJson = hyperlink(
-  "mods.json",
-  hideLinkEmbed(
-    "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/mods.json",
-  ),
-);
+const baseURL =
+  "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files";
+
+const modsJson = hyperlink("mods.json", hideLinkEmbed(`${baseURL}/mods.json`));
 const packsJson = hyperlink(
   "packs.json",
-  hideLinkEmbed(
-    "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/packs.json",
-  ),
+  hideLinkEmbed(`${baseURL}/packs.json`),
 );
 const permsJson = hyperlink(
   "update_perms.json",
-  hideLinkEmbed(
-    "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files/update_perms.json",
-  ),
+  hideLinkEmbed(`${baseURL}/update_perms.json`),
 );
 const mistakeLine = "-# If you believe this to be a mistake, please make a PR";
 

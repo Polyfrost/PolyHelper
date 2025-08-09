@@ -190,6 +190,9 @@ const Crashes = z.object({
 });
 type Crashes = z.infer<typeof Crashes>;
 
+export const getCrashes = async () =>
+  await getJSON("Polyfrost/CrashData", "main", "crashes.json", Crashes);
+
 async function verbalizeCrash(
   log: string,
   isSkyClient: boolean,
@@ -199,12 +202,7 @@ async function verbalizeCrash(
   const profileRoot = isSkyClient ? ".minecraft/skyclient" : ".minecraft";
   let crashData: Crashes;
   try {
-    crashData = await getJSON(
-      "SkyblockClient/CrashData",
-      "main",
-      "crashes.json",
-      Crashes,
-    );
+    crashData = await getCrashes();
   } catch (e) {
     logger.error("Failed to parse crashes.json", e);
     return [

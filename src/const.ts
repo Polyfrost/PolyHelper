@@ -92,6 +92,8 @@ export const Emojis = {
   Light: "💡",
   MindBlown: "🤯",
   Eyes: "👀",
+  Check: "✅",
+  Cross: "❌",
 };
 
 export const SupportTeams: Record<string, string> = {
