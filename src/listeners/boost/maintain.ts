@@ -4,7 +4,7 @@ import { Client, type UserResolvable } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { BoostersDB } from "../../lib/db.js";
 import { Polyfrost, SkyClient } from "../../const.js";
-import { z } from "zod/v4-mini";
+import { z } from "zod";
 import { readGHFile, writeGHFile } from "../../lib/GHAPI.js";
 import { format } from "prettier";
 import { Time } from "@sapphire/time-utilities";
@@ -32,12 +32,11 @@ const TagName = "Supporter";
 const TagsJSON = z.object({
   tags: z.record(
     z.string(),
-    z.union([z.tuple([z.string(), z.string()]), z.tuple([z.string()])]),
+    z.tuple([z.string(), z.string()]).or(z.tuple([z.string()])),
   ),
-  perms: z.intersection(
-    z.record(z.string(), z.array(z.string())),
-    z.object({ [TagName]: z.array(z.string()) }),
-  ),
+  perms: z
+    .record(z.string(), z.array(z.string()))
+    .and(z.object({ [TagName]: z.array(z.string()) })),
   whitelist: z.boolean(),
   whitelisted: z.array(z.string()),
 });

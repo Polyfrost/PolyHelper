@@ -1,11 +1,11 @@
-import { getJSON } from "../../lib/data.js";
+import { getRepoJSON } from "../../lib/data.js";
 
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import logger from "../../lib/logger.ts";
 import { Message } from "discord.js";
 import { Polyfrost, SkyClient } from "../../const.js";
-import { z } from "zod/v4-mini";
+import { z } from "zod";
 import { isTicket } from "../../lib/ticket.js";
 import { buildDeleteBtnRow } from "../../lib/builders.js";
 import { isTruthy } from "remeda";
@@ -49,8 +49,8 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
 }
 
 const AutoResp = z.object({
-  triggers: z.optional(z.array(z.string())),
-  skyclient: z.optional(z.boolean()),
+  triggers: z.array(z.string()).optional(),
+  skyclient: z.boolean().optional(),
   response: z.string(),
 });
 type AutoResp = z.infer<typeof AutoResp>;
@@ -65,7 +65,7 @@ type Resp = z.infer<typeof Resp>;
 export async function findAutoresps(message: string, isSkyClient: boolean) {
   let resps: AutoResp[];
   try {
-    resps = await getJSON("botautoresponse", AutoResps);
+    resps = await getRepoJSON("botautoresponse", AutoResps);
   } catch (e) {
     logger.error("Failed to read botautoresponse.json!", e);
     return [];

@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import logger from "../../lib/logger.ts";
-import { getTrackedData } from "../../lib/data.js";
+import { getJSON } from "../../lib/data.js";
 import {
   type APIEmbed,
   type APIEmbedField,
@@ -12,7 +12,7 @@ import {
   type MessageActionRowComponentData,
   blockQuote,
 } from "discord.js";
-import { z } from "zod/v4-mini";
+import { z } from "zod";
 import { SkyClient } from "../../const.js";
 import { Log, postLog, maxSize } from "../../lib/mcLogs.js";
 import { FetchResultTypes, fetch } from "@sapphire/fetch";
@@ -174,9 +174,9 @@ const CrashCause = z.object({
   value: z.string(),
 });
 const CrashFix = z.object({
-  name: z.optional(z.string()),
-  fixtype: z.optional(z.number()),
-  onlySkyClient: z.optional(z.boolean()),
+  name: z.string().optional(),
+  fixtype: z.number().optional(),
+  onlySkyClient: z.boolean().optional(),
   fix: z.string(),
   causes: z.array(CrashCause),
 });
@@ -199,8 +199,10 @@ async function verbalizeCrash(
   const profileRoot = isSkyClient ? ".minecraft/skyclient" : ".minecraft";
   let crashData: Crashes;
   try {
-    crashData = await getTrackedData(
-      "https://github.com/SkyblockClient/CrashData/raw/main/crashes.json",
+    crashData = await getJSON(
+      "SkyblockClient/CrashData",
+      "main",
+      "crashes.json",
       Crashes,
     );
   } catch (e) {

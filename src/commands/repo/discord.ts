@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import { Discord, Discords, getJSON, queryData } from "../../lib/data.js";
+import { Discord, Discords, getRepoJSON, queryData } from "../../lib/data.js";
 import {
   ApplicationCommandOptionType,
   EmbedBuilder,
@@ -33,7 +33,7 @@ export class UserCommand extends Command {
   ) {
     const query = interaction.options.getString("discord", true);
 
-    const items = await getJSON("discords", Discords);
+    const items = await getRepoJSON("discords", Discords);
     const item = queryData(items, query);
     if (!item) return interaction.reply({ content: `No Discord found` });
 

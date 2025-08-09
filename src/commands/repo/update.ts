@@ -14,10 +14,10 @@ import {
   TextDisplayBuilder,
 } from "discord.js";
 import JSZip from "jszip";
-import { Mods, getJSON, getMods, getPacks } from "../../lib/data.js";
+import { Mods, getRepoJSON, getMods, getPacks } from "../../lib/data.js";
 import { checkMember, hasPermission } from "../../lib/update.js";
 import { SkyClient, Emojis, repoURL } from "../../const.js";
-import { z } from "zod/v4-mini";
+import { z } from "zod";
 import { basename } from "node:path/posix";
 import {
   PendingUpdatesDB,
@@ -33,7 +33,7 @@ import dedent from "dedent";
 import { assert } from "@std/assert";
 
 const ModInfo = z.array(z.object({ modid: z.string() }));
-const URL = z.string().check(z.url());
+const URL = z.url();
 
 const modsJson = hyperlink(
   "mods.json",
@@ -218,7 +218,7 @@ export class UserCommand extends Subcommand {
     };
 
     const modsRef = await getMods();
-    const mods = isBeta ? await getJSON("mods_beta", Mods) : modsRef;
+    const mods = isBeta ? await getRepoJSON("mods_beta", Mods) : modsRef;
 
     const existingMod =
       mods.find((mod) => mod.forge_id == modId) ||

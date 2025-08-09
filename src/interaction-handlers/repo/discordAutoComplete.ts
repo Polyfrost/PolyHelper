@@ -7,7 +7,7 @@ import {
   AutocompleteInteraction,
   type ApplicationCommandOptionChoiceData,
 } from "discord.js";
-import { Discords, getJSON, probableMatches } from "../../lib/data.js";
+import { Discords, getRepoJSON, probableMatches } from "../../lib/data.js";
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Autocomplete,
@@ -26,7 +26,7 @@ export class AutocompleteHandler extends InteractionHandler {
     switch (focusedOption.name) {
       case "discord": {
         const items: ApplicationCommandOptionChoiceData[] = probableMatches(
-          await getJSON("discords", Discords),
+          await getRepoJSON("discords", Discords),
           value,
         ).map((v) => ({
           name: v.fancyname || v.id,

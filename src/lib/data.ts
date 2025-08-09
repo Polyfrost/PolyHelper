@@ -1,5 +1,5 @@
 import { fetch, FetchResultTypes } from "@sapphire/fetch";
-import { z } from "zod/v4-mini";
+import { z } from "zod";
 import { repoFilesURL } from "../const.js";
 import { levenshteinDistance } from "@std/text";
 import pMemoize, { pMemoizeClear } from "p-memoize";
@@ -12,7 +12,6 @@ import {
   type InteractionReplyOptions,
 } from "discord.js";
 import { MessageBuilder } from "@sapphire/discord.js-utilities";
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import logger from "./logger.ts";
 import { getRepoCount } from "./GHAPI.ts";
 
@@ -32,32 +31,56 @@ const getTrackedJSON = pMemoize(_getTrackedJSON, {
 });
 
 export async function getTrackedData(url: string): Promise<unknown>;
-export async function getTrackedData<T extends StandardSchemaV1>(
+export async function getTrackedData<T extends z.core.$ZodType>(
   url: string,
   schema: T,
-): Promise<StandardSchemaV1.InferOutput<T>>;
+): Promise<z.output<T>>;
 export async function getTrackedData(
   url: string,
-  schema: StandardSchemaV1 = z.unknown(),
+  schema: z.core.$ZodType = z.unknown(),
 ): Promise<unknown> {
   const resp = await getTrackedJSON(url);
-  let ret = schema["~standard"].validate(resp);
-  if (ret instanceof Promise) ret = await ret;
-
-  if (ret.issues) throw new Error(JSON.stringify(ret.issues, null, 2));
-  return ret.value;
+  return z.parse(schema, resp);
 }
 
-export async function getJSON(filename: string): Promise<unknown>;
-export async function getJSON<T extends StandardSchemaV1>(
+export async function getJSON(
+  repo: string,
+  branch: string,
+  path: string,
+): Promise<unknown>;
+export async function getJSON<T extends z.core.$ZodType>(
+  repo: string,
+  branch: string,
+  path: string,
+  schema: T,
+): Promise<z.output<T>>;
+export async function getJSON(
+  repo: string,
+  branch: string,
+  path: string,
+  schema: z.core.$ZodType = z.unknown(),
+): Promise<unknown> {
+  return await getTrackedData(
+    `https://github.com/${repo}/raw/${branch}/${path}`,
+    schema,
+  );
+}
+
+export async function getRepoJSON(filename: string): Promise<unknown>;
+export async function getRepoJSON<T extends z.core.$ZodType>(
   filename: string,
   schema: T,
-): Promise<StandardSchemaV1.InferOutput<T>>;
-export async function getJSON(
+): Promise<z.output<T>>;
+export async function getRepoJSON(
   filename: string,
-  schema: StandardSchemaV1 = z.unknown(),
+  schema: z.core.$ZodType = z.unknown(),
 ): Promise<unknown> {
-  return await getTrackedData(`${repoFilesURL}/${filename}.json`, schema);
+  return await getJSON(
+    "SkyblockClient/SkyblockClient-REPO",
+    "main",
+    `files/${filename}.json`,
+    schema,
+  );
 }
 
 export function invalidateTrackedData() {
@@ -70,8 +93,8 @@ export type DataType = z.infer<typeof DataType>;
 
 export const Data = z.looseObject({
   id: z.string(),
-  nicknames: z.optional(z.array(z.string())),
-  display: z.optional(z.string()),
+  nicknames: z.array(z.string()).optional(),
+  display: z.string().optional(),
 });
 export type Data = z.infer<typeof Data>;
 
@@ -83,63 +106,57 @@ export type Data = z.infer<typeof Data>;
 // 	document: z.string().optional()
 // });
 
-export const Downloadable = z.extend(Data, {
+export const Downloadable = Data.extend({
   display: z.string(),
   // enabled: z.boolean().optional(),
-  creator: z.optional(z.string()),
+  creator: z.string().optional(),
   description: z.string(),
-  icon: z.optional(z.string()),
+  icon: z.string().optional(),
   // icon_scaling: z.literal('pixel').optional(),
   // discordcode: z.string().optional(),
   // actions: Action.array().optional(),
-  categories: z.optional(z.array(z.string())),
-  hidden: z.optional(z.boolean()),
+  categories: z.array(z.string()).optional(),
+  hidden: z.boolean().optional(),
 
   file: z.string(),
-  url: z.optional(z.string()),
-  hash: z.optional(z.string()),
-  sha256: z.optional(z.string()),
+  url: z.string().optional(),
+  hash: z.string().optional(),
+  sha256: z.string().optional(),
 });
 export type Downloadable = z.infer<typeof Downloadable>;
 
-export const Mod = z.pipe(
-  z.extend(Downloadable, {
-    command: z.optional(z.string()),
-    // warning: z
-    // 	.object({
-    // 		lines: z.string().array()
-    // 	})
-    // 	.optional(),
-    // update_to_ids: z.string().array().optional(),
-    // files: z.string().array().optional(),
-    forge_id: z.optional(z.string()),
-    packages: z.optional(z.array(z.string())),
-  }),
-  z.transform((v) => ({
-    ...v,
-    download: v.url || `${repoFilesURL}/mods/${v.file}`,
-  })),
-);
+export const Mod = Downloadable.extend({
+  command: z.string().optional(),
+  // warning: z
+  // 	.object({
+  // 		lines: z.string().array()
+  // 	})
+  // 	.optional(),
+  // update_to_ids: z.string().array().optional(),
+  // files: z.string().array().optional(),
+  forge_id: z.string().optional(),
+  packages: z.array(z.string()).optional(),
+}).transform((v) => ({
+  ...v,
+  download: v.url || `${repoFilesURL}/mods/${v.file}`,
+}));
 export type Mod = z.output<typeof Mod>;
 
-export const Pack = z.pipe(
-  z.extend(Downloadable, {
-    screenshot: z.optional(z.string()),
-  }),
-  z.transform((v) => ({
-    ...v,
-    download: v.url || `${repoFilesURL}/packs/${v.file}`,
-  })),
-);
+export const Pack = Downloadable.extend({
+  screenshot: z.string().optional(),
+}).transform((v) => ({
+  ...v,
+  download: v.url || `${repoFilesURL}/packs/${v.file}`,
+}));
 export type Pack = z.output<typeof Pack>;
 
-export const Discord = z.extend(Data, {
-  icon: z.optional(z.string()),
-  description: z.optional(z.string()),
+export const Discord = Data.extend({
+  icon: z.string().optional(),
+  description: z.string().optional(),
   // partner: z.boolean().optional(),
   // type: DataType.optional(),
   code: z.string(),
-  fancyname: z.optional(z.string()),
+  fancyname: z.string().optional(),
   // mods: z.string().array().optional(),
   // packs: z.string().array().optional()
 });
@@ -149,9 +166,9 @@ export const Mods = z.array(Mod);
 export const Packs = z.array(Pack);
 export const Discords = z.array(Discord);
 
-export const getMods = async () => await getJSON("mods", Mods);
-export const getPacks = async () => await getJSON("packs", Packs);
-export const getDiscords = async () => await getJSON("discords", Discords);
+export const getMods = async () => await getRepoJSON("mods", Mods);
+export const getPacks = async () => await getRepoJSON("packs", Packs);
+export const getDiscords = async () => await getRepoJSON("discords", Discords);
 
 export const queryData = <T extends Data>(items: T[], query: string) =>
   items.find((opt) => getDistance(opt, query) == 0);

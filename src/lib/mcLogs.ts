@@ -2,7 +2,7 @@ import { FetchResultTypes, fetch } from "@sapphire/fetch";
 import { Time } from "@sapphire/time-utilities";
 import ExpiryMap from "expiry-map";
 import pMemoize from "p-memoize";
-import { z } from "zod/v4-mini";
+import { z } from "zod";
 
 const baseURL = "https://api.mclo.gs/1";
 export const maxSize = 10_485_760;
@@ -98,9 +98,9 @@ const AnalysisEntry = z.object({
 
 const LogInsights = z.object({
   id: z.string(),
-  name: z.nullable(z.string()),
+  name: z.string().nullable(),
   type: z.string(),
-  version: z.nullable(z.string()),
+  version: z.string().nullable(),
   title: z.string(),
   analysis: z.object({
     problems: z.array(

@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
-import { getJSON } from "./data.js";
-import { z } from "zod/v4-mini";
+import { getRepoJSON } from "./data.js";
+import { z } from "zod";
 import { SkyClient, isDevUser, Users } from "../const.js";
 
 const Permission = z.enum(["update", "approve"]);
@@ -8,13 +8,13 @@ type Permission = z.infer<typeof Permission>;
 
 const UpdatePerm = z.object({
   github: z.string(),
-  mods: z.optional(z.record(z.string(), Permission)),
-  packs: z.optional(z.record(z.string(), Permission)),
+  mods: z.record(z.string(), Permission).optional(),
+  packs: z.record(z.string(), Permission).optional(),
 });
 const UpdatePerms = z.record(z.string(), UpdatePerm);
 
 export const getUpdatePerms = async () =>
-  await getJSON("update_perms", UpdatePerms);
+  await getRepoJSON("update_perms", UpdatePerms);
 
 export async function checkMember(member: GuildMember): Promise<
   | { all: true }

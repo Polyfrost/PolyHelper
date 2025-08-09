@@ -11,19 +11,19 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@eslint/js": "^9.30.1",
+    "@eslint/js": "^9.33.0",
     "@sapphire/cli": "^1.9.3",
     "@sapphire/ts-config": "^5.0.1",
     "@tsconfig/bun": "^1.0.8",
-    "@types/bun": "^1.2.18",
-    "eslint": "^9.30.1",
-    "eslint-config-prettier": "^10.1.5",
+    "@types/bun": "^1.2.19",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
     "globals": "^16.3.0",
     "prettier": "^3.6.2",
-    "typescript-eslint": "^8.35.1"
+    "typescript-eslint": "^8.39.0"
   },
   "dependencies": {
-    "@octokit/core": "^7.0.2",
+    "@octokit/core": "^7.0.3",
     "@octokit/rest": "^22.0.0",
     "@sapphire/decorators": "^6.2.0",
     "@sapphire/discord.js-utilities": "^7.3.3",
@@ -36,7 +36,6 @@
     "@sapphire/time-utilities": "^1.7.14",
     "@sapphire/utilities": "^3.18.2",
     "@skyra/env-utilities": "^2.0.1",
-    "@standard-schema/spec": "^1.0.0",
     "@std/assert": "npm:@jsr/std__assert",
     "@std/fmt": "npm:@jsr/std__fmt",
     "@std/text": "npm:@jsr/std__text",
@@ -47,11 +46,11 @@
     "lowdb": "^7.0.1",
     "p-map": "^7.0.3",
     "p-memoize": "^7.1.1",
-    "remeda": "^2.24.0",
-    "zod": "^3.25.74"
+    "remeda": "^2.30.0",
+    "zod": "^4.0.16"
   },
   "peerDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.2"
   },
   "trustedDependencies": [
     "@sapphire/type",
