@@ -251,5 +251,5 @@ async function _getRepoCount() {
   return count;
 }
 export const getRepoCount = pMemoize(_getRepoCount, {
-  cache: new ExpiryMap(Time.Day),
+  cache: new ExpiryMap(Time.Hour),
 });
