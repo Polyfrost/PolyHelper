@@ -135,14 +135,14 @@ async function tryParse(name: string, fn: () => Promise<unknown>) {
       `${Emojis.Check} Successfully parsed ${name}`,
     );
   } catch (e) {
-    let error = `**Unknown error while testing ${name}**`;
+    let error = `Unknown error while testing ${name}`;
     if (e instanceof z.ZodError)
-      error = `**Failed to parse ${name}**\n${z.prettifyError(e)}`;
+      error = `Failed to parse ${name}\n${z.prettifyError(e)}`;
     else console.error(`DEBUG Failed to parse ${name}`, e);
     return new ContainerBuilder()
       .setAccentColor(Colors.Red)
       .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`${Emojis.Cross} ${error}`),
+        new TextDisplayBuilder().setContent(`### ${error}`),
       );
   }
 }
