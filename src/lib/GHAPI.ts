@@ -6,6 +6,7 @@ import { assert } from "@std/assert";
 import ExpiryMap from "expiry-map";
 import pmap from "p-map";
 import pMemoize from "p-memoize";
+import { decodeBase64 } from "@std/encoding/base64";
 
 export const octokit = new Octokit({ auth: envParseString("GH_KEY", null) });
 export const committer = {
@@ -37,7 +38,10 @@ export async function readGHFile(
   assert(data.type == "file", "not a file");
   assert(data.content, "no content");
 
-  return { owner, repo, path, content: atob(data.content), sha: data.sha };
+  const bytes = decodeBase64(data.content);
+  const content = new TextDecoder("utf-8").decode(bytes);
+
+  return { owner, repo, path, content, sha: data.sha };
 }
 
 export async function readGHContent(

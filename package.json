@@ -19,7 +19,6 @@
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
     "globals": "^16.3.0",
-    "prettier": "^3.6.2",
     "typescript-eslint": "^8.39.0"
   },
   "dependencies": {
@@ -37,6 +36,7 @@
     "@sapphire/utilities": "^3.18.2",
     "@skyra/env-utilities": "^2.0.1",
     "@std/assert": "npm:@jsr/std__assert",
+    "@std/encoding": "npm:@jsr/std__encoding",
     "@std/fmt": "npm:@jsr/std__fmt",
     "@std/text": "npm:@jsr/std__text",
     "dedent": "^1.6.0",
@@ -46,6 +46,7 @@
     "lowdb": "^7.0.1",
     "p-map": "^7.0.3",
     "p-memoize": "^7.1.1",
+    "prettier": "^3.6.2",
     "remeda": "^2.30.0",
     "zod": "^4.0.16"
   },
