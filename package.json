@@ -11,23 +11,23 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
-    "@eslint/js": "^9.33.0",
+    "@eslint/js": "^9.37.0",
     "@sapphire/cli": "^1.9.3",
     "@sapphire/ts-config": "^5.0.1",
-    "@tsconfig/bun": "^1.0.8",
-    "@types/bun": "^1.2.19",
-    "eslint": "^9.33.0",
+    "@tsconfig/bun": "^1.0.9",
+    "@types/bun": "^1.3.0",
+    "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
-    "globals": "^16.3.0",
-    "typescript-eslint": "^8.39.0"
+    "globals": "^16.4.0",
+    "typescript-eslint": "^8.46.1"
   },
   "dependencies": {
-    "@octokit/core": "^7.0.3",
+    "@octokit/core": "^7.0.5",
     "@octokit/rest": "^22.0.0",
     "@sapphire/decorators": "^6.2.0",
     "@sapphire/discord.js-utilities": "^7.3.3",
     "@sapphire/fetch": "^3.0.5",
-    "@sapphire/framework": "^5.3.6",
+    "@sapphire/framework": "^5.3.7",
     "@sapphire/plugin-editable-commands": "^4.0.4",
     "@sapphire/plugin-logger": "^4.1.0",
     "@sapphire/plugin-subcommands": "^7.0.1",
@@ -39,19 +39,19 @@
     "@std/encoding": "npm:@jsr/std__encoding",
     "@std/fmt": "npm:@jsr/std__fmt",
     "@std/text": "npm:@jsr/std__text",
-    "dedent": "^1.6.0",
-    "discord.js": "^14.21.0",
+    "dedent": "^1.7.0",
+    "discord.js": "^14.23.2",
     "expiry-map": "^2.0.0",
     "jszip": "^3.10.1",
     "lowdb": "^7.0.1",
     "p-map": "^7.0.3",
-    "p-memoize": "^7.1.1",
+    "p-memoize": "^8.0.0",
     "prettier": "^3.6.2",
-    "remeda": "^2.30.0",
-    "zod": "^4.0.16"
+    "remeda": "^2.32.0",
+    "zod": "^4.1.12"
   },
   "peerDependencies": {
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.3"
   },
   "trustedDependencies": [
     "@sapphire/type",
