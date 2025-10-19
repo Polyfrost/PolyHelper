@@ -38,7 +38,7 @@ export async function readGHFile(
   assert(data.type == "file", "not a file");
   assert(data.content, "no content");
 
-  const bytes = decodeBase64(data.content);
+  const bytes = decodeBase64(data.content.replaceAll("\n", ""));
   const content = new TextDecoder("utf-8").decode(bytes);
 
   return { owner, repo, path, content, sha: data.sha };
