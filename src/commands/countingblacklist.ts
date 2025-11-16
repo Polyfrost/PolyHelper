@@ -52,7 +52,11 @@ export class UserCommand extends Command {
     if (!isGuildMember(member)) return;
 
     const isPolyfrost = interaction.guildId == Polyfrost.id;
-    if (!isPolyfrost) return;
+    if (!isPolyfrost)
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "This command is only available in the Polyfrost server.",
+      });
 
     const noCountingRole = Polyfrost.roles.NoCounting;
     const botLogsChannel = Polyfrost.channels.BotLogs;
@@ -103,7 +107,11 @@ export class UserCommand extends Command {
       });
     } catch (e) {
       logger.error(e);
+      await interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "Failed to blacklist user from counting. Please try again.",
+      });
     }
-    return;
+
   }
 }
