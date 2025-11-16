@@ -29,6 +29,7 @@ export const SkyClient = {
     GiveawayBypass: "1187979851706142793",
     GiveawayDonor: "1186726399789248693",
     SupportTeam: "931626562539909130",
+    ModTeam: "796896475719401524",
   },
 };
 
@@ -51,6 +52,8 @@ export const Polyfrost = {
     SupportTeam: "997376364460114001",
     Testers: "1262485117549412487",
     DevAccess: "1388282908443148378",
+    NoCounting: "1116377446393057280",
+    ModTeam: "822070886223052841",
   },
 };
 
