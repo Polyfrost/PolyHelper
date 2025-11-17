@@ -91,17 +91,6 @@ export function isSupportTeam(member: FirstArgument<typeof isGuildMember>) {
   );
 }
 
-export function isModTeam(member: FirstArgument<typeof isGuildMember>) {
-  if (!isGuildMember(member)) return false;
-  return (
-    member.permissions.has("Administrator") ||
-    member.roles.cache.hasAny(
-      SkyClient.roles.ModTeam,
-      Polyfrost.roles.ModTeam,
-    )
-  );
-}
-
 export const isBumpMessage = (msg: Message) =>
   msg.author.id == msg.client.user.id &&
   msg.embeds.some((embed) => embed.title == "Do you still need help?");

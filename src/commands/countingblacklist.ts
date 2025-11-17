@@ -7,8 +7,9 @@ import {
   EmbedBuilder,
   MessageFlags,
 } from "discord.js";
-import { Polyfrost } from "../const.ts";
+import { Polyfrost, SkyClient } from "../const.ts";
 import { isSupportTeam } from "../lib/ticket.ts";
+import type { FirstArgument } from "@sapphire/utilities";
 
 @ApplyOptions<Command.Options>({
   description: "Blacklist a user from counting",
@@ -43,7 +44,7 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    if (!isSupportTeam(interaction.member))
+    if (!isModTeam(interaction.member))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
@@ -114,4 +115,15 @@ export class UserCommand extends Command {
     }
 
   }
+}
+
+export function isModTeam(member: FirstArgument<typeof isGuildMember>) {
+  if (!isGuildMember(member)) return false;
+  return (
+    member.permissions.has("Administrator") ||
+    member.roles.cache.hasAny(
+      SkyClient.roles.ModTeam,
+      Polyfrost.roles.ModTeam,
+    )
+  );
 }
