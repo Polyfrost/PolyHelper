@@ -7,9 +7,8 @@ import {
   EmbedBuilder,
   MessageFlags,
 } from "discord.js";
-import { Polyfrost, SkyClient } from "../const.ts";
-import { isSupportTeam } from "../lib/ticket.ts";
-import type { FirstArgument } from "@sapphire/utilities";
+import { Polyfrost } from "../const.ts";
+import { isModTeam } from "../lib/permissions.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Blacklist a user from counting",
@@ -97,13 +96,13 @@ export class UserCommand extends Command {
       const botLogs = interaction.client.channels.cache.get(botLogsChannel);
       if (!isTextChannel(botLogs)) return;
 
-      embed.setAuthor({
+      const logEmbed = new EmbedBuilder(embed.data).setAuthor({
         name: `${interaction.user.displayName} (${interaction.user.id})`,
         iconURL: interaction.user.displayAvatarURL(),
       });
       await botLogs.send({
         content: message,
-        embeds: [embed],
+        embeds: [logEmbed],
         allowedMentions: { parse: [] },
       });
     } catch (e) {
@@ -113,17 +112,6 @@ export class UserCommand extends Command {
         content: "Failed to blacklist user from counting. Please try again.",
       });
     }
-
+    return;
   }
-}
-
-export function isModTeam(member: FirstArgument<typeof isGuildMember>) {
-  if (!isGuildMember(member)) return false;
-  return (
-    member.permissions.has("Administrator") ||
-    member.roles.cache.hasAny(
-      SkyClient.roles.ModTeam,
-      Polyfrost.roles.ModTeam,
-    )
-  );
 }
