@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import logger from "../lib/logger.ts";
+import consola from "consola";
 import {
   ApplicationCommandOptionType,
   channelMention,
@@ -45,7 +45,12 @@ export class UserCommand extends Command {
           "Couldn't find this Minecraft account. Did you type it correctly?",
       });
 
-    logger.info("Saving Supporter", supporter, interaction.user.id, profile.id);
+    consola.info(
+      "Saving Supporter",
+      supporter,
+      interaction.user.id,
+      profile.id,
+    );
     await BoostersDB.update((data) => {
       data[interaction.user.id] = profile.id;
     });

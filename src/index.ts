@@ -3,7 +3,7 @@ import { GatewayIntentBits, Partials } from "discord.js";
 import "@sapphire/plugin-editable-commands/register";
 import "@sapphire/plugin-logger/register";
 import { setup } from "@skyra/env-utilities";
-import logger from "./lib/logger.ts";
+import consola from "consola";
 
 setup();
 
@@ -18,12 +18,11 @@ const client = new SapphireClient({
   ],
   partials: [Partials.Channel],
   loadMessageCommandListeners: true,
-  logger,
 });
 
-logger.info("Connecting...");
+consola.info("Connecting...");
 await client.login();
-logger.info("Connected");
+consola.success("Connected");
 
 declare module "@skyra/env-utilities" {
   interface Env {

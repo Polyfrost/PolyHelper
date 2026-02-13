@@ -1,5 +1,5 @@
 import { Events, Listener, container } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { DiscordAPIError, roleMention } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { SupportTeams, Users } from "../../const.js";
@@ -28,7 +28,7 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
     const stopwatch = new Stopwatch();
     // We want the bot to prefetch and cache ticket information.
     await pMap(tickets, getTicketOwner);
-    logger.info(
+    consola.success(
       `Pre-cached ${tickets.length} tickets.`,
       `Took ${stopwatch.stop().toString()}`,
     );
@@ -82,10 +82,10 @@ async function expireTickets(ticket: TextChannel) {
     const header = `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
       if (e.code == 50001) return;
-      logger.error(header, e.code, e.message);
-    } else if (e instanceof Error && e.name == "ConnectTimeoutError") {
-      logger.error(header, "Connect Timeout Error");
-    } else logger.error(header, e);
+      consola.error(header, e.code, e.message);
+    } else if (e instanceof Error && e.name == "ConnectTimeoutError")
+      consola.error(header, "Connect Timeout Error");
+    else consola.error(header, e);
   }
 }
 
@@ -99,10 +99,10 @@ export async function pinTop(ticket: TextChannel) {
     const header = `Failed to pin ticket top in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
       if (e.code == 50001) return;
-      logger.error(header, e.code, e.message);
+      consola.error(header, e.code, e.message);
     } else if (e instanceof Error && e.name == "ConnectTimeoutError") {
-      logger.error(header, "Connect Timeout Error");
-    } else logger.error(header, e);
+      consola.error(header, "Connect Timeout Error");
+    } else consola.error(header, e);
   }
 }
 

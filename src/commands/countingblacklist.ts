@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { isGuildMember, isTextChannel } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
-import logger from "../lib/logger.ts";
+import consola from "consola";
 import {
   ApplicationCommandOptionType,
   EmbedBuilder,
@@ -87,7 +87,7 @@ export class UserCommand extends Command {
     try {
       await member.roles.add(noCountingRole);
     } catch (e) {
-      logger.error("Failed to blacklist user from counting", member, e);
+      consola.error("Failed to blacklist user from counting", member, e);
       return await interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Failed to blacklist user from counting",
@@ -105,7 +105,7 @@ export class UserCommand extends Command {
 
     const botLogs = interaction.client.channels.cache.get(botLogsChannel);
     if (!isTextChannel(botLogs)) {
-      logger.error("Bot logs channel not found", botLogsChannel);
+      consola.error("Bot logs channel not found", botLogsChannel);
       return;
     }
 

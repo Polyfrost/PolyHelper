@@ -1,4 +1,4 @@
-import logger from "./logger.ts";
+import consola from "consola";
 import { Octokit } from "@octokit/rest";
 import { Time } from "@sapphire/time-utilities";
 import { envParseString } from "@skyra/env-utilities";
@@ -90,7 +90,7 @@ async function getBaseTreeSha(owner: string, repo: string, branch: string) {
 
     return { baseCommitSha, baseTreeSha };
   } catch (error) {
-    logger.error("Error retrieving base tree SHA:", error);
+    consola.error("Error retrieving base tree SHA:", error);
     throw error;
   }
 }
@@ -110,7 +110,7 @@ async function createBlob(
     });
     return data.sha;
   } catch (error) {
-    logger.error("Error creating blob:", error);
+    consola.error("Error creating blob:", error);
     throw error;
   }
 }
@@ -137,7 +137,7 @@ async function createTree(
       type: "blob" as const,
       sha: file.sha,
     }));
-    logger.info("tree", tree);
+    consola.info("tree", tree);
 
     const { data } = await octokit.git.createTree({
       owner,
@@ -148,7 +148,7 @@ async function createTree(
 
     return data.sha;
   } catch (error) {
-    logger.error("Error creating tree:", error);
+    consola.error("Error creating tree:", error);
     throw error;
   }
 }
@@ -171,7 +171,7 @@ async function createCommit(
 
     return data.sha;
   } catch (error) {
-    logger.error("Error creating commit:", error);
+    consola.error("Error creating commit:", error);
     throw error;
   }
 }
@@ -190,7 +190,7 @@ async function updateReference(
       sha: commitSha,
     });
   } catch (error) {
-    logger.error("Error updating reference:", error);
+    consola.error("Error updating reference:", error);
     throw error;
   }
 }
@@ -217,8 +217,8 @@ export async function commitFiles(
     repo,
     branch,
   );
-  logger.info("baseCommit", baseCommitSha);
-  logger.info("baseTreeSha", baseTreeSha);
+  consola.info("baseCommit", baseCommitSha);
+  consola.info("baseTreeSha", baseTreeSha);
 
   const blobs: Blob[] = await pmap(files, async (file) => {
     const sha = await (typeof file.content == "string"
@@ -226,10 +226,10 @@ export async function commitFiles(
       : createBinaryBlob(owner, repo, file.content));
     return { path: file.path, sha };
   });
-  logger.info("blobs", blobs);
+  consola.info("blobs", blobs);
 
   const treeSha = await createTree(owner, repo, baseTreeSha, blobs);
-  logger.info("treeSha", treeSha);
+  consola.info("treeSha", treeSha);
   const commitSha = await createCommit(
     owner,
     repo,
@@ -237,7 +237,7 @@ export async function commitFiles(
     treeSha,
     baseCommitSha,
   );
-  logger.info("commitSha", commitSha);
+  consola.info("commitSha", commitSha);
   await updateReference(owner, repo, branch, commitSha);
 }
 

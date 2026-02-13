@@ -12,17 +12,17 @@ import {
   type InteractionReplyOptions,
 } from "discord.js";
 import { MessageBuilder } from "@sapphire/discord.js-utilities";
-import logger from "./logger.ts";
 import { getRepoCount } from "./GHAPI.ts";
+import consola from "consola";
 
 async function _getTrackedJSON(url: string): Promise<unknown> {
-  logger.info("refetching", url);
+  consola.info("refetching", url);
   try {
     const resp = await fetch(url, FetchResultTypes.Result);
     if (!resp.ok) throw new Error(`http error ${resp.statusText}`);
     return resp.json();
   } catch (e) {
-    console.error(`error while fetching ${url}`, e);
+    consola.error(`error while fetching ${url}`, e);
     throw new Error(`error while fetching ${url}`, { cause: e });
   }
 }

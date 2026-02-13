@@ -2,7 +2,7 @@ import { getRepoJSON } from "../../lib/data.js";
 
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { Message } from "discord.js";
 import { Polyfrost, SkyClient } from "../../const.js";
 import { z } from "zod";
@@ -67,7 +67,7 @@ export async function findAutoresps(message: string, isSkyClient: boolean) {
   try {
     resps = await getRepoJSON("botautoresponse", AutoResps);
   } catch (e) {
-    logger.error("Failed to read botautoresponse.json!", e);
+    consola.error("Failed to read botautoresponse.json!", e);
     return [];
   }
   return resps

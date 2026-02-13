@@ -16,6 +16,7 @@ import { z } from "zod";
 import { Emojis } from "../const.ts";
 import { getUpdatePerms } from "../lib/update.ts";
 import { getCrashes } from "../listeners/resps/handleLogs.ts";
+import consola from "consola";
 
 @ApplyOptions<Subcommand.Options>({
   description: "Debug commands... for debugging... (DEBUG)",
@@ -138,7 +139,7 @@ async function tryParse(name: string, fn: () => Promise<unknown>) {
     let error = `Unknown error while testing ${name}`;
     if (e instanceof z.ZodError)
       error = `Failed to parse ${name}\n${z.prettifyError(e)}`;
-    else console.error(`DEBUG Failed to parse ${name}`, e);
+    else consola.error(`DEBUG Failed to parse ${name}`, e);
     return new ContainerBuilder()
       .setAccentColor(Colors.Red)
       .addTextDisplayComponents(

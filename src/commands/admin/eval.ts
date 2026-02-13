@@ -5,7 +5,7 @@ import { send } from "@sapphire/plugin-editable-commands";
 import { codeBlock, isThenable } from "@sapphire/utilities";
 import type { Message } from "discord.js";
 import { inspect } from "util";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 
 @ApplyOptions<Command.Options>({
   aliases: ["ev"],
@@ -60,9 +60,7 @@ export class UserCommand extends Command {
     try {
       ret = eval(code);
     } catch (error) {
-      if (error && error instanceof Error && error.stack) {
-        logger.error(error);
-      }
+      if (error && error instanceof Error && error.stack) consola.error(error);
       ret = error;
       success = false;
     }

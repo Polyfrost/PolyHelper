@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { getJSON } from "../../lib/data.js";
 import {
   type APIEmbed,
@@ -60,7 +60,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
         await message.delete();
       } catch (e) {
         // message may have already been deleted by another bot
-        logger.error("Failed to delete log message", e);
+        consola.error("Failed to delete log message", e);
       }
       text = await mcLog.getRaw();
       const insights = await mcLog.getInsights();
@@ -108,7 +108,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
         },
       );
     } catch (e) {
-      console.error(e);
+      consola.error(e);
       embeds.push({
         title: "Failed to upload to mclo.gs",
         color: Colors.Red,
@@ -204,7 +204,7 @@ async function verbalizeCrash(
   try {
     crashData = await getCrashes();
   } catch (e) {
-    logger.error("Failed to parse crashes.json", e);
+    consola.error("Failed to parse crashes.json", e);
     return [
       {
         name: "Failed to parse crashes.json",

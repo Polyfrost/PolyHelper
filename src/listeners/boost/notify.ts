@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import {
   type PartialGuildMember,
   GuildMember,
@@ -27,7 +27,7 @@ export class UserEvent extends Listener<typeof Events.GuildMemberUpdate> {
     const botLogs = user.client.channels.cache.get(SkyClient.channels.BotLogs);
 
     if (oldUser.premiumSince && !user.premiumSince) {
-      logger.info("Boost stop", user.id);
+      consola.info("Boost stop", user.id);
       if (isTextChannel(botLogs))
         await botLogs.send(`${formatUser(user)} stopped boosting`);
       if (!user.roles.cache.has(SkyClient.roles.GiveawayDonor))
@@ -36,7 +36,7 @@ export class UserEvent extends Listener<typeof Events.GuildMemberUpdate> {
           "Stopped boosting",
         );
     } else if (!oldUser.premiumSince && user.premiumSince) {
-      logger.info("Boost start", user.id);
+      consola.info("Boost start", user.id);
       if (isTextChannel(botLogs))
         await botLogs.send(`${formatUser(user)} started boosting`);
 

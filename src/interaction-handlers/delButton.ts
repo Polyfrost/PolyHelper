@@ -3,7 +3,7 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from "@sapphire/framework";
-import logger from "./../lib/logger.ts";
+import consola from "consola";
 import { MessageFlags, type ButtonInteraction } from "discord.js";
 import { Polyfrost, SkyClient } from "../const.js";
 
@@ -30,7 +30,7 @@ export class ButtonHandler extends InteractionHandler {
           content: "You don't have permission to delete this.",
         });
     } catch (e) {
-      logger.warn("could not delete", interaction.message, e);
+      consola.warn("could not delete", interaction.message, e);
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "could not delete",

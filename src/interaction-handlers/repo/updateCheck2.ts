@@ -3,7 +3,7 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import {
   BaseInteraction,
   ButtonBuilder,
@@ -111,7 +111,7 @@ export class ButtonHandler extends InteractionHandler {
           throw new Error(`${fileResp.statusText} while fetching ${data.url}`);
         fileData = await fileResp.arrayBuffer();
       } catch (e) {
-        logger.error("Failed to download file", e);
+        consola.error("Failed to download file", e);
         await message.edit(
           errorMessage(
             data,
@@ -167,7 +167,7 @@ export class ButtonHandler extends InteractionHandler {
         ),
       );
     } catch (e) {
-      logger.error("Failed to update", data, e);
+      consola.error("Failed to update", data, e);
       return await message.edit(
         errorMessage(
           data,

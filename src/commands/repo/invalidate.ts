@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { invalidateTrackedData } from "../../lib/data.js";
 import { Polyfrost, SkyClient, shrug } from "../../const.js";
 import { formatUser } from "../../lib/logHelper.js";
@@ -32,7 +32,7 @@ export class UserCommand extends Command {
       false;
 
     if (!canDo) {
-      logger.info(`${formatUser(user)} has been validated.`);
+      consola.success(`${formatUser(user)} has been validated.`);
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "No invalidating, but I can validate you instead.",

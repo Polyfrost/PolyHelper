@@ -1,5 +1,5 @@
 import { Events, Listener } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { Client } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { SkyClient } from "../../const.js";
@@ -17,7 +17,7 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
       if (!member.premiumSince) continue;
       if (member.roles.cache.has(SkyClient.roles.GiveawayBypass)) continue;
 
-      logger.info("Giving bypass", id);
+      consola.info("Giving bypass", id);
       await member.roles.add(
         SkyClient.roles.GiveawayBypass,
         "User started boosting",

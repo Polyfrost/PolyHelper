@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { isGuildMember, isTextChannel } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
-import logger from "../lib/logger.ts";
+import consola from "consola";
 import {
   ApplicationCommandOptionType,
   EmbedBuilder,
@@ -107,7 +107,7 @@ export class UserCommand extends Command {
         allowedMentions: { parse: [] },
       });
     } catch (e) {
-      logger.error(e);
+      consola.error(e);
     }
     return;
   }

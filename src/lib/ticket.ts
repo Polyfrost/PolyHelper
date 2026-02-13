@@ -3,7 +3,7 @@ import {
   isGuildMember,
   isTextChannel,
 } from "@sapphire/discord.js-utilities";
-import logger from "./logger.ts";
+import consola from "consola";
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
 import { Message, roleMention, TextChannel } from "discord.js";
@@ -19,15 +19,15 @@ export async function setTicketOpen(
     throw new Error(`open undefined WHY IS THIS HAPPENING`);
   const header = `${open ? "Opening" : "Closing"} ${formatChannel(channel)}`;
   if (!isTicket(channel)) {
-    logger.warn(header, "Not a ticket");
+    consola.warn(header, "Not a ticket");
     return;
   }
 
   const owner = await getTicketOwner(channel);
   if (owner) {
-    logger.info(header, "for", owner);
+    consola.info(header, "for", owner);
     await channel.permissionOverwrites.edit(owner, { SendMessages: open });
-  } else logger.warn(header, "Failed to find owner");
+  } else consola.warn(header, "Failed to find owner");
 }
 
 async function _getTicketTop(ticket: ChannelTypes) {

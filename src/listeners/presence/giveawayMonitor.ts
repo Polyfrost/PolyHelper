@@ -6,7 +6,7 @@ import {
 } from "discord.js";
 import { Polyfrost, SkyClient } from "../../const.js";
 import { Events, Listener } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { ApplyOptions } from "@sapphire/decorators";
 import {
   isGuildBasedChannel,
@@ -110,7 +110,7 @@ export class MessageListener extends Listener<typeof Events.MessageCreate> {
         allowedMentions: { parse: [] },
       });
     } catch (e) {
-      logger.error(e);
+      consola.error(e);
     }
   }
 }

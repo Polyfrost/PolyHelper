@@ -1,5 +1,5 @@
 import { Events, Listener, container } from "@sapphire/framework";
-import logger from "../../lib/logger.ts";
+import consola from "consola";
 import { Client, type UserResolvable } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
 import { BoostersDB } from "../../lib/db.js";
@@ -18,7 +18,7 @@ import { envParseString } from "@skyra/env-utilities";
 export class ReadyListener extends Listener<typeof Events.ClientReady> {
   public override async run(client: Client<true>) {
     if (!envParseString("GH_KEY", null))
-      return logger.error("Missing GitHub API Key!");
+      return consola.error("Missing GitHub API Key!");
     await run(client);
     setInterval(() => void run(client), Time.Minute * 5);
   }
@@ -54,7 +54,7 @@ export async function run(client: Client<true>) {
 
     await updateBoosters(supporters);
   } catch (e) {
-    logger.error("Failed to update tags", e);
+    consola.error("Failed to update tags", e);
   }
 }
 

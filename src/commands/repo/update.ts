@@ -1,5 +1,5 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import logger from "./../../lib/logger.ts";
+import consola from "consola";
 import { Subcommand } from "@sapphire/plugin-subcommands";
 import { createHash } from "crypto";
 import {
@@ -155,7 +155,7 @@ export class UserCommand extends Subcommand {
       headers: { "User-Agent": repoURL },
     });
     if (!modResp.ok) {
-      logger.error(
+      consola.error(
         `${modResp.statusText} while fetching ${url}`,
         await modResp.text(),
       );
@@ -173,10 +173,10 @@ export class UserCommand extends Subcommand {
           const modInfo = ModInfo.parse(JSON.parse(modInfoStr));
           modId = modInfo[0]?.modid;
         } catch (e) {
-          logger.error("Failed to read mcmod.info", e);
+          consola.error("Failed to read mcmod.info", e);
         }
     } catch (e) {
-      logger.error("Failed to read ZIP", e);
+      consola.error("Failed to read ZIP", e);
       return int.editReply("Failed to read ZIP. Is the URL correct?");
     }
     modId = modId || int.options.getString("forge_id");
@@ -279,7 +279,7 @@ export class UserCommand extends Subcommand {
       headers: { "User-Agent": repoURL },
     });
     if (!modResp.ok) {
-      logger.error(
+      consola.error(
         `${modResp.statusText} while fetching ${url}`,
         await modResp.text(),
       );
@@ -292,7 +292,7 @@ export class UserCommand extends Subcommand {
       const modInfoFile = modZip.file("pack.mcmeta");
       if (!modInfoFile) throw new Error();
     } catch (e) {
-      logger.error("Failed to read ZIP", e);
+      consola.error("Failed to read ZIP", e);
       return int.editReply("Failed to read ZIP. Is the URL correct?");
     }
 
