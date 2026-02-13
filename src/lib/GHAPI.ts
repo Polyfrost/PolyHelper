@@ -6,7 +6,7 @@ import { assert } from "@std/assert";
 import ExpiryMap from "expiry-map";
 import pmap from "p-map";
 import pMemoize from "p-memoize";
-import { decodeBase64 } from "@std/encoding/base64";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 
 export const octokit = new Octokit({ auth: envParseString("GH_KEY", null) });
 export const committer = {
@@ -67,7 +67,7 @@ export async function writeGHFile(
 
     committer,
     message: commitMsg,
-    content: btoa(content),
+    content: encodeBase64(content),
     sha: oldFile.sha,
   });
 }
