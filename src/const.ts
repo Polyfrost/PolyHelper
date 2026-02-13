@@ -82,13 +82,17 @@ export const EmojiIDs = {
 // Animated Emojis
 export const AEmojiIDs: Record<string, string> = {};
 
+const emojiMap = Object.fromEntries(
+  Object.entries(EmojiIDs).map(([k, v]) => [k, formatEmoji(v)]),
+) as Record<keyof typeof EmojiIDs, `<:emoji:${string}>`>;
+
+const aEmojiMap = Object.fromEntries(
+  Object.entries(AEmojiIDs).map(([k, v]) => [k, formatEmoji(v, true)]),
+) as Record<keyof typeof AEmojiIDs, `<a:emoji:${string}>`>;
+
 export const Emojis = {
-  ...(Object.fromEntries(
-    Object.entries(EmojiIDs).map(([k, v]) => [k, formatEmoji(v)]),
-  ) as Record<keyof typeof EmojiIDs, `<:_:${string}>`>),
-  ...(Object.fromEntries(
-    Object.entries(AEmojiIDs).map(([k, v]) => [k, formatEmoji(v, true)]),
-  ) as Record<keyof typeof EmojiIDs, `<a:_:${string}>`>),
+  ...emojiMap,
+  ...aEmojiMap,
 
   Thinking: "🤔",
   Shaking: "🫨",

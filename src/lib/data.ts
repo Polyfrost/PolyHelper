@@ -23,7 +23,7 @@ async function _getTrackedJSON(url: string): Promise<unknown> {
     return resp.json();
   } catch (e) {
     console.error(`error while fetching ${url}`, e);
-    throw new Error(`error while fetching ${url}`);
+    throw new Error(`error while fetching ${url}`, { cause: e });
   }
 }
 const getTrackedJSON = pMemoize(_getTrackedJSON, {
