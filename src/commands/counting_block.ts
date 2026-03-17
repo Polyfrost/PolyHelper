@@ -11,7 +11,7 @@ import { Polyfrost } from "../const.ts";
 import { isModTeam } from "../lib/permissions.ts";
 
 @ApplyOptions<Command.Options>({
-  description: "Blacklist a user from counting",
+  description: "Block a user from counting",
   requiredClientPermissions: ["ManageRoles"],
 })
 export class UserCommand extends Command {
@@ -23,7 +23,7 @@ export class UserCommand extends Command {
         {
           type: ApplicationCommandOptionType.User,
           name: "user",
-          description: "User to blacklist",
+          description: "User to block",
           required: true,
         },
         {
@@ -69,7 +69,7 @@ export class UserCommand extends Command {
     if (roles.has(noCountingRole))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "User is already Counting blacklisted",
+        content: "User is already blocked from counting",
       });
 
     const reason =
@@ -87,10 +87,10 @@ export class UserCommand extends Command {
     try {
       await member.roles.add(noCountingRole);
     } catch (e) {
-      consola.error("Failed to blacklist user from counting", member, e);
+      consola.error("Failed to block user from counting", member, e);
       return await interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "Failed to blacklist user from counting",
+        content: "Failed to block user from counting",
       });
     }
 

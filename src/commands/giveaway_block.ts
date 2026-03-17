@@ -10,7 +10,7 @@ import {
 import { Polyfrost, SkyClient } from "../const.ts";
 
 @ApplyOptions<Command.Options>({
-  description: "Blacklist a user from giveaways",
+  description: "Block a user from giveaways",
   requiredUserPermissions: ["ManageRoles"],
   requiredClientPermissions: ["ManageRoles"],
 })
@@ -23,7 +23,7 @@ export class UserCommand extends Command {
         {
           type: ApplicationCommandOptionType.User,
           name: "user",
-          description: "User to blacklist",
+          description: "User to block",
           required: true,
         },
         {
@@ -61,7 +61,7 @@ export class UserCommand extends Command {
     if (roles.has(noGiveawaysRole))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "User is already blacklisted",
+        content: "User is already blocked from giveaways",
       });
     if (roles.has(SkyClient.roles.CoolPeople))
       return interaction.reply({
