@@ -83,9 +83,12 @@ export function isSupportTeam(member: FirstArgument<typeof isGuildMember>) {
   if (!isGuildMember(member)) return false;
   return (
     member.permissions.has("Administrator") ||
+    member.permissions.has("ManageMessages") ||
     member.roles.cache.hasAny(
       SkyClient.roles.SupportTeam,
       Polyfrost.roles.SupportTeam,
+      Polyfrost.roles.ModTeam,
+      Polyfrost.roles.PolyTeam,
       DevServer.roles.SupportTeam,
     )
   );
