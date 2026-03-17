@@ -5,6 +5,7 @@ import {
   isTicket,
   isSupportTeam,
   findDoNotCloseChannel,
+  isPinned,
 } from "../../lib/ticket.js";
 
 export const PINNED_TICKET_MESSAGE =
@@ -42,10 +43,17 @@ export class UserCommand extends Command {
         content: "Could not find the do-not-close channel...",
       });
 
+    const pinned = await isPinned(channel);
     await channel.setPosition(doNotCloseChannel.position);
 
+    if (pinned)
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content:
+          "**This ticket is already pinned.**\nTicket has been pushed to the bottom of the pinned section.",
+      });
     return interaction
-      .reply({ content: PINNED_TICKET_MESSAGE })
+      .reply(PINNED_TICKET_MESSAGE)
       .then((message) => message.fetch().then((message) => message.pin()));
   }
 }

@@ -58,8 +58,6 @@ export class UserCommand extends Command {
           .forEach((message) => message.unpin()),
       );
 
-    return interaction.reply({
-      content: "Ticket has been unpinned",
-    });
+    return interaction.reply("Ticket has been unpinned");
   }
 }
