@@ -51,7 +51,7 @@ export class UserCommand extends Command {
     if (!doNotCloseChannel)
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "Count not find the do-not-close channel...",
+        content: "Could not find the do-not-close channel...",
       });
 
     await channel.setPosition(doNotCloseChannel.position);

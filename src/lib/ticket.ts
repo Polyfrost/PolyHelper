@@ -123,7 +123,7 @@ export async function findDoNotCloseChannel(
         .filter((channel) => channel?.parent?.id === parent.id),
     );
   const doNotCloseChannel = channels.find(
-    (channel) => channel.name.toLowerCase() === "do-not-close",
+    (channel) => channel.name === "do-not-close",
   );
   if (!isTextChannel(doNotCloseChannel)) return null;
   return doNotCloseChannel;
