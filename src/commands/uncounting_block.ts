@@ -11,7 +11,7 @@ import { Polyfrost } from "../const.ts";
 import { isModTeam } from "../lib/permissions.ts";
 
 @ApplyOptions<Command.Options>({
-  description: "Unblacklist a user from counting",
+  description: "Unblock a user from counting",
   requiredClientPermissions: ["ManageRoles"],
 })
 export class UserCommand extends Command {
@@ -23,7 +23,7 @@ export class UserCommand extends Command {
         {
           type: ApplicationCommandOptionType.User,
           name: "user",
-          description: "User to unblacklist",
+          description: "User to unblock",
           required: true,
         },
         {
@@ -69,7 +69,7 @@ export class UserCommand extends Command {
     if (!roles.has(noCountingRole))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "User is Not Counting blacklisted",
+        content: "User is not blocked from counting",
       });
 
     const reason =
@@ -85,12 +85,12 @@ export class UserCommand extends Command {
     const message = `${member.toString()} has been unblocked from counting`;
 
     try {
-      await member.roles.add(noCountingRole);
+      await member.roles.remove(noCountingRole);
     } catch (e) {
-      consola.error("Failed to unblacklist user from counting", member, e);
+      consola.error("Failed to unblock user from counting", member, e);
       return await interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "Failed to unblacklist user from counting",
+        content: "Failed to unblock user from counting",
       });
     }
 
