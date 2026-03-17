@@ -8,7 +8,7 @@ import {
 } from "../../lib/ticket.js";
 
 @ApplyOptions<Command.Options>({
-  description: "Moves a ticket into do-not-close",
+  description: "Unpins a ticket",
 })
 export class UserCommand extends Command {
   public override registerApplicationCommands(registry: Command.Registry) {
@@ -54,10 +54,10 @@ export class UserCommand extends Command {
         content: "Could not find the do-not-close channel...",
       });
 
-    await channel.setPosition(doNotCloseChannel.position);
+    await channel.setPosition(doNotCloseChannel.position + 0.5);
     return interaction.reply({
       flags: MessageFlags.Ephemeral,
-      content: "Channel has been moved up into do-not-close",
+      content: "Channel has been unpinned",
     });
   }
 }
