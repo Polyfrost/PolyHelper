@@ -128,3 +128,12 @@ export async function findDoNotCloseChannel(
   if (!isTextChannel(doNotCloseChannel)) return null;
   return doNotCloseChannel;
 }
+
+export async function isPinned(
+  guild: Guild,
+  channel: TextChannel,
+): Promise<boolean> {
+  const doNotCloseChannel = await findDoNotCloseChannel(guild, channel);
+  if (doNotCloseChannel === null) return false;
+  return channel.position < doNotCloseChannel.position;
+}

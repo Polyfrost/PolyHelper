@@ -5,6 +5,7 @@ import {
   isTicket,
   isSupportTeam,
   findDoNotCloseChannel,
+  isPinned,
 } from "../../lib/ticket.js";
 
 @ApplyOptions<Command.Options>({
@@ -31,6 +32,11 @@ export class UserCommand extends Command {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
+      });
+    if (!(await isPinned(guild, channel)))
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "This ticket is not pinned",
       });
     const doNotCloseChannel = await findDoNotCloseChannel(guild, channel);
     if (!doNotCloseChannel)
