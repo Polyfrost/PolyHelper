@@ -6,7 +6,7 @@ import {
 import consola from "consola";
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
-import { Message, roleMention, TextChannel } from "discord.js";
+import { Guild, Message, roleMention, TextChannel } from "discord.js";
 import pMemoize from "p-memoize";
 import { formatChannel } from "./logHelper.js";
 import { DevServer, Polyfrost, SkyClient, SupportTeams } from "../const.js";
@@ -107,4 +107,24 @@ export function isStaffPing(msg: Message) {
     msg.author.id == msg.client.user.id &&
     msg.content.startsWith(roleMention(support))
   );
+}
+
+export async function findDoNotCloseChannel(
+  guild: Guild,
+  ticketChannel: TextChannel,
+): Promise<TextChannel | null> {
+  const parent = ticketChannel.parent;
+  if (!parent) return null;
+  const channels = await guild.channels
+    .fetch()
+    .then((channels) =>
+      channels
+        .filter((channel) => channel !== null)
+        .filter((channel) => channel?.parent?.id === parent.id),
+    );
+  const doNotCloseChannel = channels.find(
+    (channel) => channel.name.toLowerCase() === "do-not-close",
+  );
+  if (!isTextChannel(doNotCloseChannel)) return null;
+  return doNotCloseChannel;
 }
