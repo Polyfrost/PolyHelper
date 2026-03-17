@@ -7,6 +7,7 @@ import {
   findDoNotCloseChannel,
   isPinned,
 } from "../../lib/ticket.js";
+import { PINNED_TICKET_MESSAGE } from "./pinticket.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Unpins a ticket",
@@ -46,9 +47,19 @@ export class UserCommand extends Command {
       });
 
     await channel.setPosition(doNotCloseChannel.position + 0.5);
-    return interaction.reply({
-      flags: MessageFlags.Ephemeral,
-      content: "Channel has been unpinned",
+
+    channel.messages
+      .fetchPins()
+      .then((messages) => messages.items.map((message) => message.message))
+      .then((messages) =>
+        messages
+          .filter((message) => message.author.id === interaction.client.user.id)
+          .filter((message) => message.content === PINNED_TICKET_MESSAGE)
+          .forEach((message) => message.unpin()),
+      );
+
+    interaction.reply({
+      content: "Ticket has been unpinned\nYou can now close",
     });
   }
 }

@@ -7,6 +7,9 @@ import {
   findDoNotCloseChannel,
 } from "../../lib/ticket.js";
 
+export const PINNED_TICKET_MESSAGE =
+  "This ticket has been pinned.\nPlease do not close it.";
+
 @ApplyOptions<Command.Options>({
   description: "Pin a ticket",
 })
@@ -40,9 +43,9 @@ export class UserCommand extends Command {
       });
 
     await channel.setPosition(doNotCloseChannel.position);
-    return interaction.reply({
-      flags: MessageFlags.Ephemeral,
-      content: "Channel has been pinned",
-    });
+
+    return interaction
+      .reply({ content: PINNED_TICKET_MESSAGE })
+      .then((message) => message.fetch().then((message) => message.pin()));
   }
 }
