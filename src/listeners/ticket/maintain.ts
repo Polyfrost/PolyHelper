@@ -8,6 +8,7 @@ import {
   getTicketOwner,
   getTicketTop,
   isBumpMessage,
+  isPinned,
   isStaffPing,
   isTicket,
 } from "../../lib/ticket.js";
@@ -49,6 +50,7 @@ async function expireTickets(ticket: TextChannel) {
   try {
     const support = SupportTeams[ticket.guildId];
     if (!support) return;
+    if (await isPinned(ticket)) return;
 
     const messages = await ticket.messages.fetch();
     const lastMsg = messages
