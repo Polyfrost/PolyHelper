@@ -6,6 +6,7 @@ import {
   getTicketOwner,
   isTicket,
   isSupportTeam,
+  isPinned,
 } from "../../lib/ticket.js";
 import { MessageBuilder } from "@sapphire/discord.js-utilities";
 import { Duration } from "@sapphire/time-utilities";
@@ -24,8 +25,8 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    const { channel } = interaction;
-    if (!isSupportTeam(interaction.member))
+    const { channel, guild } = interaction;
+    if (!guild || isSupportTeam(interaction.member))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
@@ -34,6 +35,11 @@ export class UserCommand extends Command {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
+      });
+    if (await isPinned(channel))
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "This ticket is pinned. Please unpin it before bumping",
       });
 
     const pinMsg = await getTicketTop(channel);

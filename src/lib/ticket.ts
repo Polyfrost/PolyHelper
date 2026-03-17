@@ -108,3 +108,29 @@ export function isStaffPing(msg: Message) {
     msg.content.startsWith(roleMention(support))
   );
 }
+
+export async function findDoNotCloseChannel(
+  channel: TextChannel,
+): Promise<TextChannel | null> {
+  const { guild } = channel;
+  const parent = channel.parent;
+  if (!parent) return null;
+  const channels = await guild.channels
+    .fetch()
+    .then((channels) =>
+      channels
+        .filter((channel) => channel !== null)
+        .filter((channel) => channel?.parent?.id === parent.id),
+    );
+  const doNotCloseChannel = channels.find(
+    (channel) => channel.name === "do-not-close",
+  );
+  if (!isTextChannel(doNotCloseChannel)) return null;
+  return doNotCloseChannel;
+}
+
+export async function isPinned(channel: TextChannel): Promise<boolean> {
+  const doNotCloseChannel = await findDoNotCloseChannel(channel);
+  if (doNotCloseChannel === null) return false;
+  return channel.position < doNotCloseChannel.position;
+}
