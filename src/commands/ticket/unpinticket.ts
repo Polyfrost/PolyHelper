@@ -59,7 +59,7 @@ export class UserCommand extends Command {
       );
 
     return interaction.reply({
-      content: "Ticket has been unpinned\nYou can now close",
+      content: "Ticket has been unpinned",
     });
   }
 }

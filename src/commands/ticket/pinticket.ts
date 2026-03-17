@@ -8,7 +8,7 @@ import {
 } from "../../lib/ticket.js";
 
 export const PINNED_TICKET_MESSAGE =
-  "This ticket has been pinned.\nPlease do not close it.";
+  "**This ticket has been pinned.**\n*Please* do not close it.";
 
 @ApplyOptions<Command.Options>({
   description: "Pin a ticket",
