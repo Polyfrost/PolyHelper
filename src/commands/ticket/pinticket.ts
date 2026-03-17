@@ -35,7 +35,7 @@ export class UserCommand extends Command {
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
-    const doNotCloseChannel = await findDoNotCloseChannel(guild, channel);
+    const doNotCloseChannel = await findDoNotCloseChannel(channel);
     if (!doNotCloseChannel)
       return interaction.reply({
         flags: MessageFlags.Ephemeral,

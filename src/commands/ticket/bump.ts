@@ -36,7 +36,7 @@ export class UserCommand extends Command {
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
-    if (await isPinned(guild, channel))
+    if (await isPinned(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "This ticket is pinned. Please unpin it before bumping",

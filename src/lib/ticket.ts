@@ -6,7 +6,7 @@ import {
 import consola from "consola";
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
-import { Guild, Message, roleMention, TextChannel } from "discord.js";
+import { Message, roleMention, TextChannel } from "discord.js";
 import pMemoize from "p-memoize";
 import { formatChannel } from "./logHelper.js";
 import { DevServer, Polyfrost, SkyClient, SupportTeams } from "../const.js";
@@ -110,10 +110,10 @@ export function isStaffPing(msg: Message) {
 }
 
 export async function findDoNotCloseChannel(
-  guild: Guild,
-  ticketChannel: TextChannel,
+  channel: TextChannel,
 ): Promise<TextChannel | null> {
-  const parent = ticketChannel.parent;
+  const { guild } = channel;
+  const parent = channel.parent;
   if (!parent) return null;
   const channels = await guild.channels
     .fetch()
@@ -129,11 +129,8 @@ export async function findDoNotCloseChannel(
   return doNotCloseChannel;
 }
 
-export async function isPinned(
-  guild: Guild,
-  channel: TextChannel,
-): Promise<boolean> {
-  const doNotCloseChannel = await findDoNotCloseChannel(guild, channel);
+export async function isPinned(channel: TextChannel): Promise<boolean> {
+  const doNotCloseChannel = await findDoNotCloseChannel(channel);
   if (doNotCloseChannel === null) return false;
   return channel.position < doNotCloseChannel.position;
 }
