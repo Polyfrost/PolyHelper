@@ -23,8 +23,8 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    const { channel, guild } = interaction;
-    if (!guild || isSupportTeam(interaction.member))
+    const { channel } = interaction;
+    if (!isSupportTeam(interaction.member))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
