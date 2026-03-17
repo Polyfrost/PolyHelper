@@ -54,6 +54,7 @@ export const Polyfrost = {
     DevAccess: "1388282908443148378",
     NoCounting: "1116377446393057280",
     ModTeam: "822070886223052841",
+    PolyTeam: "982578079673245726",
   },
 };
 
