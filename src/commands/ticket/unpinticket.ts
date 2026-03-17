@@ -22,12 +22,7 @@ export class UserCommand extends Command {
     interaction: Command.ChatInputCommandInteraction,
   ) {
     const { channel, guild } = interaction;
-    if (!guild)
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: "❔",
-      });
-    if (!isSupportTeam(interaction.member))
+    if (!guild || isSupportTeam(interaction.member))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
@@ -36,16 +31,6 @@ export class UserCommand extends Command {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
-      });
-    if (!channel.parent)
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: "This channel doesn't have a category...",
-      });
-    if (!channel.parent.name.toLowerCase().endsWith("tickets"))
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: "Bold of you to assume this is a ticket category...",
       });
     const doNotCloseChannel = await findDoNotCloseChannel(guild, channel);
     if (!doNotCloseChannel)
