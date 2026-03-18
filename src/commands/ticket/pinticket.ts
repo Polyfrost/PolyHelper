@@ -13,6 +13,7 @@ export const PINNED_TICKET_MESSAGE =
 
 @ApplyOptions<Command.Options>({
   description: "Pin a ticket",
+  requiredClientPermissions: ["ManageChannels"],
 })
 export class UserCommand extends Command {
   public override registerApplicationCommands(registry: Command.Registry) {

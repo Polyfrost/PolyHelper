@@ -11,6 +11,7 @@ import { PINNED_TICKET_MESSAGE } from "./pinticket.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Unpins a ticket",
+  requiredClientPermissions: ["ManageChannels"],
 })
 export class UserCommand extends Command {
   public override registerApplicationCommands(registry: Command.Registry) {
