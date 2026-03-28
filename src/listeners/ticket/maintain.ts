@@ -57,26 +57,26 @@ async function expireTickets(ticket: TextChannel) {
       .filter((message) => message.author.id != Users.TicketTool)
       .first();
     if (!lastMsg) return;
-    if (isStaffPing(lastMsg)) return;
 
-    const lastPing = messages.filter(isStaffPing).first();
-    if (lastPing) {
-      const oneHr = new Duration("1h").dateFrom(lastPing.createdAt);
-      if (oneHr < new Date()) return;
-    }
+    if (isStaffPing(lastMsg)) {
+      const lastPing = messages.filter(isStaffPing).first();
+      if (lastPing) {
+        // Don't ping again if the last ping was less than an hour ago
+        const oneHr = new Duration("1h").dateFrom(lastPing.createdAt);
+        if (oneHr < new Date()) return;
+      }
 
-    const ownerId = await getTicketOwner(ticket);
-    if (ownerId) {
-      const owner = ticket.guild.members.resolve(ownerId);
-      if (!owner)
-        return void pingStaff(
-          ticket,
-          dedent`Owner left. Please close ticket.
+      const ownerId = await getTicketOwner(ticket);
+      if (ownerId) {
+        const owner = ticket.guild.members.resolve(ownerId);
+        if (!owner)
+          return void pingStaff(
+            ticket,
+            dedent`Owner left. Please close ticket.
             (I don't have hands to do it myself...)`,
-        );
-    }
-
-    if (isBumpMessage(lastMsg)) {
+          );
+      }
+    } else if (isBumpMessage(lastMsg)) {
       const twoDays = new Duration("2d").dateFrom(lastMsg.createdAt);
       if (twoDays < new Date()) return void pingStaff(ticket, "Time to close");
     }
