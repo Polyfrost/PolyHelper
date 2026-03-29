@@ -111,26 +111,17 @@ export function isStaffPing(msg: Message) {
 
 export async function findDoNotCloseChannel(
   channel: TextChannel,
-): Promise<TextChannel | null> {
-  const { guild } = channel;
-  const parent = channel.parent;
-  if (!parent) return null;
-  const channels = await guild.channels
-    .fetch()
-    .then((channels) =>
-      channels
-        .filter((channel) => channel !== null)
-        .filter((channel) => channel?.parent?.id === parent.id),
+): Promise<TextChannel | undefined> {
+  return channel.parent?.children
+    .valueOf()
+    .find(
+      (channel): channel is TextChannel =>
+        channel.name == "do-not-close" && isTextChannel(channel),
     );
-  const doNotCloseChannel = channels.find(
-    (channel) => channel.name === "do-not-close",
-  );
-  if (!isTextChannel(doNotCloseChannel)) return null;
-  return doNotCloseChannel;
 }
 
 export async function isPinned(channel: TextChannel): Promise<boolean> {
   const doNotCloseChannel = await findDoNotCloseChannel(channel);
-  if (doNotCloseChannel === null) return false;
+  if (!doNotCloseChannel) return false;
   return channel.position < doNotCloseChannel.position;
 }

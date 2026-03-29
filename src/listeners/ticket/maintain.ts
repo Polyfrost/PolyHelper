@@ -24,29 +24,56 @@ import dedent from "dedent";
 })
 export class ReadyListener extends Listener<typeof Events.ClientReady> {
   public override async run() {
-    const tickets = getTickets();
+    const tickets = await getTickets();
 
     const stopwatch = new Stopwatch();
     // We want the bot to prefetch and cache ticket information.
     await pMap(tickets, getTicketOwner);
     consola.success(
       `Pre-cached ${tickets.length} tickets.`,
-      `Took ${stopwatch.stop().toString()}`,
+      `Took ${stopwatch.stop()}.`,
     );
 
-    await pMap(getTickets(), pinTop);
-    setInterval(
-      () => void pMap(getTickets(), expireTickets, { concurrency: 3 }),
-      Time.Second * 30,
+    stopwatch.restart();
+    await pMap(
+      tickets,
+      async (ticket) => {
+        await pinTop(ticket);
+        await expireTicket(ticket);
+        await expireBumps(ticket);
+      },
+      { concurrency: 3 },
     );
-    await pMap(getTickets(), expireBumps, { concurrency: 3 });
+    consola.success(`First ticket maintainance took ${stopwatch.stop()}.`);
+
+    setInterval(() => {
+      getTickets().then((tickets) =>
+        pMap(tickets, expireTicket, { concurrency: 3 }),
+      );
+    }, Time.Second * 30);
   }
 }
 
-const getTickets = () =>
-  Array.from(container.client.channels.cache.values()).filter(isTicket);
+async function getTickets() {
+  const guilds = await container.client.guilds.fetch();
+  const allTickets = [];
 
-async function expireTickets(ticket: TextChannel) {
+  for (const [guildId, oauthGuild] of guilds) {
+    try {
+      const guild = await oauthGuild.fetch();
+      const channels = await guild.channels.fetch();
+
+      const ticketChannels = Array.from(channels.values()).filter(isTicket);
+      allTickets.push(...ticketChannels);
+    } catch (error) {
+      console.error(`Failed to fetch channels for guild ${guildId}:`, error);
+    }
+  }
+
+  return allTickets;
+}
+
+async function expireTicket(ticket: TextChannel) {
   try {
     const support = SupportTeams[ticket.guildId];
     if (!support) return;

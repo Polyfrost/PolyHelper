@@ -5,7 +5,12 @@ import { isBumpMessage, isStaffPing, isTicket } from "../../lib/ticket.js";
 import { SupportTeams, Users } from "../../const.js";
 import { assert } from "@std/assert";
 
-/** Provides info and recommendations for crashes */
+/**
+ * Deletes the "If you do not respond in [...], your ticket will be closed"
+ * embed when a new message is sent.
+ *
+ * Also deletes it on all old bot messages (ran from `./maintain.ts`)
+ */
 @ApplyOptions<Listener.Options>({
   event: Events.MessageCreate,
 })
