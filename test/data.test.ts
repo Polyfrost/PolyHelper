@@ -1,10 +1,10 @@
-import { expect, test } from "bun:test";
+import { assert } from "@std/assert";
 import { getMods, getPacks } from "../src/lib/data.ts";
 
-test("getMods", async () => {
-  expect(await getMods());
+Deno.test("getMods", async () => {
+  assert(await getMods());
 });
 
-test("getPacks", async () => {
-  expect(await getPacks());
+Deno.test("getPacks", async () => {
+  assert(await getPacks());
 });

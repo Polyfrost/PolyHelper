@@ -43,37 +43,41 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    if (!isModTeam(interaction.member))
+    if (!isModTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
+    }
     const member = interaction.options.getMember("user");
-    if (!isGuildMember(member))
+    if (!isGuildMember(member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "User not found",
       });
+    }
 
     const isPolyfrost = interaction.guildId == Polyfrost.id;
-    if (!isPolyfrost)
+    if (!isPolyfrost) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "This command is only available in the Polyfrost server.",
       });
+    }
 
     const noCountingRole = Polyfrost.roles.NoCounting;
     const botLogsChannel = Polyfrost.channels.BotLogs;
     const roles = member.roles.cache;
 
-    if (!roles.has(noCountingRole))
+    if (!roles.has(noCountingRole)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "User is not blocked from counting",
       });
+    }
 
-    const reason =
-      interaction.options.getString("reason") || "No reason provided";
+    const reason = interaction.options.getString("reason") ||
+      "No reason provided";
     const embed = new EmbedBuilder()
       .setColor("Green")
       .setTitle("Unblocked from Counting")

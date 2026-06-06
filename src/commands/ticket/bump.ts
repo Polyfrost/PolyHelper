@@ -1,15 +1,15 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { MessageBuilder } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
+import { Duration } from "@sapphire/time-utilities";
 import { Colors, hyperlink, MessageFlags, time } from "discord.js";
 import {
-  getTicketTop,
   getTicketOwner,
-  isTicket,
-  isSupportTeam,
+  getTicketTop,
   isPinned,
-} from "../../lib/ticket.js";
-import { MessageBuilder } from "@sapphire/discord.js-utilities";
-import { Duration } from "@sapphire/time-utilities";
+  isSupportTeam,
+  isTicket,
+} from "../../lib/ticket.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Bumps a ticket to encourage closing",
@@ -26,21 +26,24 @@ export class UserCommand extends Command {
     interaction: Command.ChatInputCommandInteraction,
   ) {
     const { channel } = interaction;
-    if (!isSupportTeam(interaction.member))
+    if (!isSupportTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
-    if (!isTicket(channel))
+    }
+    if (!isTicket(channel)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
-    if (await isPinned(channel))
+    }
+    if (await isPinned(channel)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "This ticket is pinned. Please unpin it before bumping",
       });
+    }
 
     const pinMsg = await getTicketTop(channel);
     const owner = await getTicketOwner(channel);
@@ -64,12 +67,14 @@ export class UserCommand extends Command {
             },
             {
               name: "> No, all my problems are solved.",
-              value: `__Close the ticket.__ View the ${pinnedMsg}, click the 🔒 button, and follow the bot's instructions.`,
+              value:
+                `__Close the ticket.__ View the ${pinnedMsg}, click the 🔒 button, and follow the bot's instructions.`,
             },
           ],
         },
         {
-          description: `If you do not respond ${twoDaysStamp}, your ticket will be closed.`,
+          description:
+            `If you do not respond ${twoDaysStamp}, your ticket will be closed.`,
           color: Colors.DarkRed,
         },
       ],

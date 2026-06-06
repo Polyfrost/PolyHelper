@@ -1,14 +1,14 @@
-import { Events, Listener, container } from "@sapphire/framework";
-import consola from "consola";
-import { Client, type UserResolvable } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
-import { BoostersDB } from "../../lib/db.js";
-import { Polyfrost, SkyClient } from "../../const.js";
-import { z } from "zod";
-import { readGHFile, writeGHFile } from "../../lib/GHAPI.js";
-import { format } from "prettier";
+import { container, Events, Listener } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
 import { envParseString } from "@skyra/env-utilities";
+import consola from "consola";
+import { Client, type UserResolvable } from "discord.js";
+import { format } from "prettier";
+import { z } from "zod";
+import { Polyfrost, SkyClient } from "../../const.ts";
+import { BoostersDB } from "../../lib/db.ts";
+import { readGHFile, writeGHFile } from "../../lib/GHAPI.ts";
 
 @ApplyOptions<Listener.Options>({
   name: "boost-maintain",
@@ -17,8 +17,9 @@ import { envParseString } from "@skyra/env-utilities";
 })
 export class ReadyListener extends Listener<typeof Events.ClientReady> {
   public override async run(client: Client<true>) {
-    if (!envParseString("GH_KEY", null))
+    if (!envParseString("GH_KEY", null)) {
       return consola.error("Missing GitHub API Key!");
+    }
     await run(client);
     setInterval(() => void run(client), Time.Minute * 5);
   }
@@ -66,7 +67,7 @@ export async function isSupporter(userID: UserResolvable) {
     const members = guild?.members;
     const member = await members.fetch(userID);
     if (member && member.premiumSince) return true;
-    // eslint-disable-next-line no-empty
+    // deno-lint-ignore no-empty
   } catch {}
 
   try {
@@ -74,7 +75,7 @@ export async function isSupporter(userID: UserResolvable) {
     const members = guild?.members;
     const member = await members.fetch(userID);
     if (member && member.roles.cache.has(Polyfrost.roles.Testers)) return true;
-    // eslint-disable-next-line no-empty
+    // deno-lint-ignore no-empty
   } catch {}
 
   return false;

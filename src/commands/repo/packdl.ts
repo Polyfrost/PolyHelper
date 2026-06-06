@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import { Pack, getPacks } from "../../lib/data.js";
 import { type APIEmbed, hyperlink, unorderedList } from "discord.js";
+import { getPacks, Pack } from "../../lib/data.ts";
 
 enum ItemType {
   Skyblock,
@@ -26,12 +26,12 @@ export class UserCommand extends Command {
     const items = (await getPacks()).filter((item) => !item.hidden);
     const categorizeItem = (item: Pack) =>
       item.categories?.includes("2;All Skyblock") ||
-      item.categories?.includes("1;All Skyblock")
+        item.categories?.includes("1;All Skyblock")
         ? ItemType.Skyblock
         : item.categories?.includes("5;All PvP") ||
             item.categories?.includes("3;All PvP")
-          ? ItemType.PvP
-          : ItemType.Other;
+        ? ItemType.PvP
+        : ItemType.Other;
     const listItems = (type: ItemType) =>
       unorderedList(
         items
@@ -48,12 +48,13 @@ export class UserCommand extends Command {
       PvP: listItems(ItemType.PvP),
       Other: listItems(ItemType.Other),
     }).map(([title, items]) => {
-      if (items)
+      if (items) {
         embeds.push({
           title,
           color,
           description: items,
         });
+      }
     });
     const totalLength = embeds.reduce((a, b) => a + b.description.length, 0);
     if (totalLength > 5000) {

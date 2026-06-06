@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import { Pack, getPacks } from "../../lib/data.js";
 import { unorderedList } from "discord.js";
+import { getPacks, Pack } from "../../lib/data.ts";
 
 enum PackType {
   Skyblock,
@@ -30,8 +30,8 @@ export class UserCommand extends Command {
       pack.categories?.includes("1;All Skyblock")
         ? PackType.Skyblock
         : pack.categories?.includes("3;All PvP")
-          ? PackType.PvP
-          : PackType.Other;
+        ? PackType.PvP
+        : PackType.Other;
     const formatPacks = (type: PackType) =>
       unorderedList(
         packs
@@ -42,9 +42,8 @@ export class UserCommand extends Command {
           ),
       );
 
-    const color =
-      (await interaction.guild?.members.fetch(interaction.user))
-        ?.displayColor || 0x8ff03f;
+    const color = (await interaction.guild?.members.fetch(interaction.user))
+      ?.displayColor || 0x8ff03f;
     return interaction.reply({
       embeds: [
         {

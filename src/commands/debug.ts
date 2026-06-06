@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Subcommand } from "@sapphire/plugin-subcommands";
-import { getTicketOwner, getTicketTop, isTicket } from "../lib/ticket.js";
+import consola from "consola";
 import {
   ChannelType,
   Colors,
@@ -11,12 +11,12 @@ import {
   TextDisplayBuilder,
   userMention,
 } from "discord.js";
-import { getDiscords, getMods, getPacks } from "../lib/data.ts";
 import { z } from "zod";
 import { Emojis } from "../const.ts";
+import { getDiscords, getMods, getPacks } from "../lib/data.ts";
+import { getTicketOwner, getTicketTop, isTicket } from "../lib/ticket.ts";
 import { getUpdatePerms } from "../lib/update.ts";
 import { getCrashes } from "../listeners/resps/handleLogs.ts";
-import consola from "consola";
 
 @ApplyOptions<Subcommand.Options>({
   description: "Debug commands... for debugging... (DEBUG)",
@@ -39,16 +39,16 @@ export class UserCommand extends Subcommand {
               option
                 .setName("channel")
                 .setDescription("Ticket channel")
-                .addChannelTypes(ChannelType.GuildText),
-            ),
+                .addChannelTypes(ChannelType.GuildText)
+            )
         )
         .addSubcommand((command) =>
           command
             .setName("json")
             .setDescription(
               "Parse all tracked JSONs and print any errors (DEBUG)",
-            ),
-        ),
+            )
+        )
     );
   }
 
@@ -57,10 +57,9 @@ export class UserCommand extends Subcommand {
   ) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const channel =
-      interaction.options.getChannel("channel", false, [
-        ChannelType.GuildText,
-      ]) || interaction.channel;
+    const channel = interaction.options.getChannel("channel", false, [
+      ChannelType.GuildText,
+    ]) || interaction.channel;
 
     if (!isTicket(channel)) return interaction.editReply("not a ticket");
 
@@ -137,9 +136,9 @@ async function tryParse(name: string, fn: () => Promise<unknown>) {
     );
   } catch (e) {
     let error = `Unknown error while testing ${name}`;
-    if (e instanceof z.ZodError)
+    if (e instanceof z.ZodError) {
       error = `Failed to parse ${name}\n${z.prettifyError(e)}`;
-    else consola.error(`DEBUG Failed to parse ${name}`, e);
+    } else consola.error(`DEBUG Failed to parse ${name}`, e);
     return new ContainerBuilder()
       .setAccentColor(Colors.Red)
       .addTextDisplayComponents(

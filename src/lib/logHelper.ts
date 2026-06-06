@@ -9,7 +9,8 @@ export function formatChannel(channel: ChannelTypes): string {
 export function formatUser(user: User): string;
 export function formatUser(member: GuildMember): string;
 export function formatUser(userOrMember: User | GuildMember): string {
-  const user: User =
-    userOrMember instanceof GuildMember ? userOrMember.user : userOrMember;
+  const user: User = userOrMember instanceof GuildMember
+    ? userOrMember.user
+    : userOrMember;
   return `${user.tag} (${user.id})`;
 }

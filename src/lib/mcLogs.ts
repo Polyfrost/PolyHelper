@@ -1,4 +1,4 @@
-import { FetchResultTypes, fetch } from "@sapphire/fetch";
+import { fetch, FetchResultTypes } from "@sapphire/fetch";
 import { Time } from "@sapphire/time-utilities";
 import ExpiryMap from "expiry-map";
 import pMemoize from "p-memoize";
@@ -65,7 +65,7 @@ const getMCLogID = (log: string | LogType) =>
 
 async function _getRawLog(log: string | LogType): Promise<string> {
   const id = getMCLogID(log);
-  return fetch(`${baseURL}/raw/${id}`, FetchResultTypes.Text);
+  return await fetch(`${baseURL}/raw/${id}`, FetchResultTypes.Text);
 }
 export const getRawLog = pMemoize(_getRawLog, {
   cacheKey: ([log]) => getMCLogID(log),

@@ -58,22 +58,24 @@ export class UserCommand extends Command {
       : Polyfrost.channels.BotLogs;
     const roles = member.roles.cache;
 
-    if (roles.has(noGiveawaysRole))
+    if (roles.has(noGiveawaysRole)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "User is already blocked from giveaways",
       });
-    if (roles.has(SkyClient.roles.CoolPeople))
+    }
+    if (roles.has(SkyClient.roles.CoolPeople)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "User is too cool 😎",
       });
+    }
 
     try {
       await member.roles.add(noGiveawaysRole);
 
-      const reason =
-        interaction.options.getString("reason") || "No reason provided";
+      const reason = interaction.options.getString("reason") ||
+        "No reason provided";
 
       const embed = new EmbedBuilder()
         .setColor("Red")

@@ -1,20 +1,20 @@
-import { SapphireClient, LogLevel, type ILogger } from "@sapphire/framework";
-import { GatewayIntentBits, Partials } from "discord.js";
+import { type ILogger, LogLevel, SapphireClient } from "@sapphire/framework";
 import "@sapphire/plugin-editable-commands/register";
 import { setup } from "@skyra/env-utilities";
 import consola from "consola";
+import { GatewayIntentBits, Partials } from "discord.js";
 
 setup();
 
 const consolaLogger: ILogger = {
   has: (level) => level >= LogLevel.Debug,
-  trace: (...args: any[]) => consola.trace.raw(...args),
-  debug: (...args: any[]) => consola.debug.raw(...args),
-  info: (...args: any[]) => consola.info.raw(...args),
-  warn: (...args: any[]) => consola.warn.raw(...args),
-  error: (...args: any[]) => consola.error.raw(...args),
-  fatal: (...args: any[]) => consola.fatal.raw(...args),
-  write: (level, ...args: any[]) => {
+  trace: (...args: unknown[]) => consola.trace.raw(...args),
+  debug: (...args: unknown[]) => consola.debug.raw(...args),
+  info: (...args: unknown[]) => consola.info.raw(...args),
+  warn: (...args: unknown[]) => consola.warn.raw(...args),
+  error: (...args: unknown[]) => consola.error.raw(...args),
+  fatal: (...args: unknown[]) => consola.fatal.raw(...args),
+  write: (level, ...args: unknown[]) => {
     switch (level) {
       case LogLevel.Trace:
         return consola.trace.raw(...args);

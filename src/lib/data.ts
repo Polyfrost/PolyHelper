@@ -1,19 +1,19 @@
+import { MessageBuilder } from "@sapphire/discord.js-utilities";
 import { fetch, FetchResultTypes } from "@sapphire/fetch";
-import { z } from "zod";
-import { repoFilesURL } from "../const.js";
-import { levenshteinDistance } from "@std/text";
-import pMemoize, { pMemoizeClear } from "p-memoize";
-import ExpiryMap from "expiry-map";
 import { Time } from "@sapphire/time-utilities";
 import { filterNullish } from "@sapphire/utilities";
+import { levenshteinDistance } from "@std/text";
+import consola from "consola";
 import {
   EmbedBuilder,
   hyperlink,
   type InteractionReplyOptions,
 } from "discord.js";
-import { MessageBuilder } from "@sapphire/discord.js-utilities";
+import ExpiryMap from "expiry-map";
+import pMemoize, { pMemoizeClear } from "p-memoize";
+import { z } from "zod";
+import { repoFilesURL } from "../const.ts";
 import { getRepoCount } from "./GHAPI.ts";
-import consola from "consola";
 
 async function _getTrackedJSON(url: string): Promise<unknown> {
   consola.info("refetching", url);
@@ -205,13 +205,15 @@ export async function getDownloadableMessage(
     description: downloadable.description,
     footer: { text: `Created by ${downloadable.creator}` },
   });
-  if (downloadable.icon)
+  if (downloadable.icon) {
     embed.setThumbnail(
       `${repoFilesURL}/icons/${encodeURIComponent(downloadable.icon)}`,
     );
-  if (isPack(downloadable) && downloadable.screenshot)
+  }
+  if (isPack(downloadable) && downloadable.screenshot) {
     embed.setImage(downloadable.screenshot);
-  if (downloadable.hidden)
+  }
+  if (downloadable.hidden) {
     embed.addFields({
       name: "Note",
       value:
@@ -220,6 +222,7 @@ export async function getDownloadableMessage(
           ? `You can get it in the bundle ${bundledIn}.`
           : "It might be internal or outdated."),
     });
+  }
 
   const mods = await getMods();
   const downloads: string[] = [
@@ -238,12 +241,13 @@ export async function getDownloadableMessage(
     inline: downloads.length == 1,
   });
 
-  if (isMod(downloadable) && downloadable.command)
+  if (isMod(downloadable) && downloadable.command) {
     embed.addFields({
       name: "Config Command",
       value: downloadable.command,
       inline: true,
     });
+  }
 
   return message.setEmbeds([embed]);
 }

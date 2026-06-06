@@ -5,7 +5,7 @@ import type {
   Message,
   Snowflake,
 } from "discord.js";
-import { Users } from "../const.js";
+import { Users } from "../const.ts";
 
 export class UserPrecondition extends AllFlowsPrecondition {
   #message = "This command can only be used by the owner.";

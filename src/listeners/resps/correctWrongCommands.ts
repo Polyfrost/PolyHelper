@@ -1,8 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { Message } from "discord.js";
-import { Users } from "../../const.js";
-import { buildDeleteBtnRow } from "../../lib/builders.js";
+import { Users } from "../../const.ts";
+import { buildDeleteBtnRow } from "../../lib/builders.ts";
 
 /** Corrects incorrect commands */
 @ApplyOptions<Listener.Options>({

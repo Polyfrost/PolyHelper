@@ -1,8 +1,8 @@
+import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import consola from "consola";
 import { Client } from "discord.js";
-import { ApplyOptions } from "@sapphire/decorators";
-import { SkyClient } from "../../const.js";
+import { SkyClient } from "../../const.ts";
 
 @ApplyOptions<Listener.Options>({
   once: true,

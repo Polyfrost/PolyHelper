@@ -1,8 +1,8 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Listener } from "@sapphire/framework";
-import { blue, gray, yellow } from "colorette";
-import { Client } from "discord.js";
+import { blue, gray, yellow } from "@std/fmt/colors";
 import consola from "consola";
+import { Client } from "discord.js";
 
 const dev = process.env.NODE_ENV !== "production";
 const style = dev ? yellow : blue;
@@ -12,13 +12,16 @@ export class UserEvent extends Listener {
   public override run(client: Client) {
     const stores = [...client.stores.values()];
 
-    for (const store of stores)
+    for (const store of stores) {
       consola.success(
         gray(
-          `Loaded ${style(store.size.toString().padEnd(3, " "))} ${
-            store.name
-          }.`,
+          `Loaded ${
+            style(
+              store.size.toString().padEnd(3, " "),
+            )
+          } ${store.name}.`,
         ),
       );
+    }
   }
 }

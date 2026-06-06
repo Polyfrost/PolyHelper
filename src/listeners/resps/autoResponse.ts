@@ -1,14 +1,14 @@
-import { getRepoJSON } from "../../lib/data.js";
-
 import { ApplyOptions } from "@sapphire/decorators";
+
 import { Events, Listener } from "@sapphire/framework";
 import consola from "consola";
 import { Message } from "discord.js";
-import { Polyfrost, SkyClient } from "../../const.js";
-import { z } from "zod";
-import { isTicket } from "../../lib/ticket.js";
-import { buildDeleteBtnRow } from "../../lib/builders.js";
 import { isTruthy } from "remeda";
+import { z } from "zod";
+import { Polyfrost, SkyClient } from "../../const.ts";
+import { buildDeleteBtnRow } from "../../lib/builders.ts";
+import { getRepoJSON } from "../../lib/data.ts";
+import { isTicket } from "../../lib/ticket.ts";
 
 /** Sends an autoresponse for the commands and suggestions we have */
 @ApplyOptions<Listener.Options>({
@@ -20,8 +20,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     if (!member) return;
     if (message.author.bot) return;
 
-    let canAutoResp =
-      channel.id == SkyClient.channels.General ||
+    let canAutoResp = channel.id == SkyClient.channels.General ||
       channel.id == SkyClient.channels.SkyblockTalk ||
       channel.id == SkyClient.channels.Support ||
       channel.id == Polyfrost.channels.General ||
@@ -38,11 +37,12 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     if (responses.length > 3) return;
 
     await Promise.all(
-      responses.map(async (resp) =>
-        message.reply({
-          content: resp.response,
-          components: !resp.tag ? [buildDeleteBtnRow(message.author)] : [],
-        }),
+      responses.map(
+        async (resp) =>
+          await message.reply({
+            content: resp.response,
+            components: !resp.tag ? [buildDeleteBtnRow(message.author)] : [],
+          }),
       ),
     );
   }
@@ -73,12 +73,14 @@ export async function findAutoresps(message: string, isSkyClient: boolean) {
   return resps
     .map((option): Resp | undefined => {
       if (option.skyclient && !isSkyClient) return;
-      if (option.triggers)
+      if (option.triggers) {
         for (const re of option.triggers) {
           const matcher = new RegExp(re, "is");
-          if (matcher.test(message))
+          if (matcher.test(message)) {
             return { response: option.response, tag: false };
+          }
         }
+      }
       return;
     })
     .filter(isTruthy);

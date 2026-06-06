@@ -3,10 +3,10 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from "@sapphire/framework";
-import type { ButtonInteraction } from "discord.js";
-import { isTicket, setTicketOpen } from "../../lib/ticket.js";
 import dedent from "dedent";
+import type { ButtonInteraction } from "discord.js";
 import { assetsBase } from "../../const.ts";
+import { isTicket, setTicketOpen } from "../../lib/ticket.ts";
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Button,
@@ -73,7 +73,8 @@ export class ButtonHandler extends InteractionHandler {
                 "1. Open your SkyClient folder. See this: https://youtu.be/BHIM2htfMk8",
               fields: [
                 {
-                  name: 'If you saw a "View Crash Report" button in the launcher:',
+                  name:
+                    'If you saw a "View Crash Report" button in the launcher:',
                   value:
                     "- Go to the `crash-reports` folder and upload the most recent file here",
                 },
@@ -107,8 +108,9 @@ export class ButtonHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ButtonInteraction) {
-    if (!interaction.customId.startsWith("ticketCategorizeCrash|"))
+    if (!interaction.customId.startsWith("ticketCategorizeCrash|")) {
       return this.none();
+    }
     return this.some();
   }
 }

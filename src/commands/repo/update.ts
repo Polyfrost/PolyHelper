@@ -1,7 +1,13 @@
+import { createHash } from "node:crypto";
+import { extname } from "node:path";
+import { basename } from "node:path/posix";
 import { ApplyOptions } from "@sapphire/decorators";
-import consola from "consola";
 import { Subcommand } from "@sapphire/plugin-subcommands";
-import { createHash } from "crypto";
+import { type Nullish } from "@sapphire/utilities";
+import { envParseString } from "@skyra/env-utilities";
+import { assert } from "@std/assert";
+import consola from "consola";
+import dedent from "dedent";
 import {
   ButtonBuilder,
   ButtonStyle,
@@ -14,23 +20,17 @@ import {
   TextDisplayBuilder,
 } from "discord.js";
 import JSZip from "jszip";
-import { Mods, getRepoJSON, getMods, getPacks } from "../../lib/data.js";
-import { checkMember, hasPermission } from "../../lib/update.js";
-import { SkyClient, Emojis, repoURL } from "../../const.js";
 import { z } from "zod";
-import { basename } from "node:path/posix";
+import { Emojis, repoURL, SkyClient } from "../../const.ts";
+import { generateDataComponent } from "../../interaction-handlers/repo/updateCheck2.ts";
+import { getMods, getPacks, getRepoJSON, Mods } from "../../lib/data.ts";
 import {
-  PendingUpdatesDB,
   type ModUpdate,
   type PackUpdate,
   type PartialUpdate,
-} from "../../lib/db.js";
-import { envParseString } from "@skyra/env-utilities";
-import { type Nullish } from "@sapphire/utilities";
-import { extname } from "path";
-import { generateDataComponent } from "../../interaction-handlers/repo/updateCheck2.ts";
-import dedent from "dedent";
-import { assert } from "@std/assert";
+  PendingUpdatesDB,
+} from "../../lib/db.ts";
+import { checkMember, hasPermission } from "../../lib/update.ts";
 
 const ModInfo = z.array(z.object({ modid: z.string() }));
 const URL = z.url();
@@ -70,7 +70,7 @@ export class UserCommand extends Subcommand {
               option
                 .setName("url")
                 .setDescription("Download URL")
-                .setRequired(true),
+                .setRequired(true)
             )
             .addStringOption((option) =>
               option
@@ -78,7 +78,7 @@ export class UserCommand extends Subcommand {
                 .setDescription(
                   "modid to update, only used if not found in mcmod.info",
                 )
-                .setRequired(false),
+                .setRequired(false)
             )
             .addStringOption((option) =>
               option
@@ -86,11 +86,11 @@ export class UserCommand extends Subcommand {
                 .setDescription(
                   "filename for the file, replacing the autodetected name",
                 )
-                .setRequired(false),
+                .setRequired(false)
             )
             .addBooleanOption((option) =>
-              option.setName("beta").setDescription("Beta").setRequired(false),
-            ),
+              option.setName("beta").setDescription("Beta").setRequired(false)
+            )
         )
         .addSubcommand((command) =>
           command
@@ -100,14 +100,14 @@ export class UserCommand extends Subcommand {
               option
                 .setName("url")
                 .setDescription("Download URL")
-                .setRequired(true),
+                .setRequired(true)
             )
             .addStringOption((option) =>
               option
                 .setName("pack")
                 .setDescription("Pack ID")
                 .setRequired(true)
-                .setAutocomplete(true),
+                .setAutocomplete(true)
             )
             .addStringOption((option) =>
               option
@@ -115,15 +115,16 @@ export class UserCommand extends Subcommand {
                 .setDescription(
                   "filename for the file, replacing the autodetected name",
                 )
-                .setRequired(false),
-            ),
-        ),
+                .setRequired(false)
+            )
+        )
     );
   }
 
   public async updateMod(int: Subcommand.ChatInputCommandInteraction) {
-    if (!envParseString("GH_KEY", null))
+    if (!envParseString("GH_KEY", null)) {
       return int.reply(`Missing GitHub API Key! ${Emojis.BlameWyvest}`);
+    }
 
     const { guild, channel } = int;
     if (!guild || !channel) return;
@@ -140,14 +141,17 @@ export class UserCommand extends Subcommand {
       });
     }
 
-    if (channel.id != SkyClient.channels.ModUpdating)
+    if (channel.id != SkyClient.channels.ModUpdating) {
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `${Emojis.Light} This command is only available in <#${SkyClient.channels.ModUpdating}>`,
+        content:
+          `${Emojis.Light} This command is only available in <#${SkyClient.channels.ModUpdating}>`,
       });
+    }
     const url = int.options.getString("url", true);
-    if (!URL.safeParse(url).success)
+    if (!URL.safeParse(url).success) {
       return int.reply(`This doesn't look like a URL to me ${Emojis.Thinking}`);
+    }
 
     await int.deferReply();
 
@@ -167,7 +171,7 @@ export class UserCommand extends Subcommand {
     try {
       const modZip = await JSZip.loadAsync(modFile);
       const modInfoFile = modZip.file("mcmod.info");
-      if (modInfoFile)
+      if (modInfoFile) {
         try {
           const modInfoStr = await modInfoFile.async("text");
           const modInfo = ModInfo.parse(JSON.parse(modInfoStr));
@@ -175,20 +179,26 @@ export class UserCommand extends Subcommand {
         } catch (e) {
           consola.error("Failed to read mcmod.info", e);
         }
+      }
     } catch (e) {
       consola.error("Failed to read ZIP", e);
       return int.editReply("Failed to read ZIP. Is the URL correct?");
     }
     modId = modId || int.options.getString("forge_id");
 
-    if (!modId)
+    if (!modId) {
       return int.editReply(
         `${Emojis.Shaking} Failed to find modid in mcmod.info!`,
       );
+    }
     if (!(await hasPermission(member, "update", "mod", modId))) {
       assert(!perms.all);
       return int.editReply(dedent`
-        ${Emojis.Shaking} You aren't allowed to update the mod \`${escapeMarkdown(modId)}\`
+        ${Emojis.Shaking} You aren't allowed to update the mod \`${
+        escapeMarkdown(
+          modId,
+        )
+      }\`
         You can only update mods with the Forge modid of: \
         ${Object.keys(perms.mods).map(inlineCode).join(", ")}
         ${mistakeLine} in ${modsJson}
@@ -214,29 +224,36 @@ export class UserCommand extends Subcommand {
     const modsRef = await getMods();
     const mods = isBeta ? await getRepoJSON("mods_beta", Mods) : modsRef;
 
-    const existingMod =
-      mods.find((mod) => mod.forge_id == modId) ||
+    const existingMod = mods.find((mod) => mod.forge_id == modId) ||
       modsRef.find((mod) => mod.forge_id == modId);
-    if (!existingMod)
+    if (!existingMod) {
       return int.editReply(dedent`
-        ${Emojis.Thinking} The database doesn't contain a mod with forge_id \`${escapeMarkdown(modId)}\`
+        ${Emojis.Thinking} The database doesn't contain a mod with forge_id \`${
+        escapeMarkdown(
+          modId,
+        )
+      }\`
         ${mistakeLine} in ${modsJson}
       `);
+    }
 
     if (
       existingMod.url == data.url &&
       existingMod.file == data.file &&
       existingMod.hash == data.hash
-    )
+    ) {
       return int.editReply("🤔 Nothing to change");
+    }
 
-    if (!extname(data.file))
+    if (!extname(data.file)) {
       return int.editReply(`${Emojis.MindBlown} File extension required`);
-    if (extname(existingMod.file) != extname(data.file))
+    }
+    if (extname(existingMod.file) != extname(data.file)) {
       return int.editReply(dedent`
         ${Emojis.MindBlown} File extension changed! \
         (\`${extname(existingMod.file)}\` -> \`${extname(data.file)}\`)
       `);
+    }
 
     const { id } = await int.fetchReply();
     await PendingUpdatesDB.update((pending) => {
@@ -247,15 +264,16 @@ export class UserCommand extends Subcommand {
   }
 
   public async updatePack(int: Subcommand.ChatInputCommandInteraction) {
-    if (!envParseString("GH_KEY", null))
+    if (!envParseString("GH_KEY", null)) {
       return int.reply(`Missing GitHub API Key! ${Emojis.BlameWyvest}`);
+    }
 
     const { guild, channel } = int;
     if (!guild || !channel) return;
     const member = int.guild?.members.resolve(int.user);
     if (!member) return;
     const perms = await checkMember(member);
-    if (!perms.all && !Object.keys(perms.packs).length)
+    if (!perms.all && !Object.keys(perms.packs).length) {
       return int.reply({
         flags: MessageFlags.Ephemeral,
         content: dedent`
@@ -263,15 +281,19 @@ export class UserCommand extends Subcommand {
           ${mistakeLine} in ${permsJson}
         `,
       });
+    }
 
-    if (channel.id != SkyClient.channels.ModUpdating)
+    if (channel.id != SkyClient.channels.ModUpdating) {
       return int.reply({
         flags: MessageFlags.Ephemeral,
-        content: `${Emojis.Thinking} This command is only available in <#${SkyClient.channels.ModUpdating}>`,
+        content:
+          `${Emojis.Thinking} This command is only available in <#${SkyClient.channels.ModUpdating}>`,
       });
+    }
     const url = int.options.getString("url", true);
-    if (!URL.safeParse(url).success)
+    if (!URL.safeParse(url).success) {
       return int.reply(`This doesn't look like a URL to me ${Emojis.Thinking}`);
+    }
 
     await int.deferReply();
 
@@ -301,7 +323,11 @@ export class UserCommand extends Subcommand {
     if (!(await hasPermission(member, "update", "pack", packId))) {
       assert(!perms.all);
       return int.editReply(dedent`
-        ${Emojis.Thinking} You aren't allowed to update the pack \`${escapeMarkdown(packId)}\`
+        ${Emojis.Thinking} You aren't allowed to update the pack \`${
+        escapeMarkdown(
+          packId,
+        )
+      }\`
         You can only update packs with the id of: \
         ${Object.keys(perms.packs).map(inlineCode).join(", ")}
         ${mistakeLine} in ${permsJson}
@@ -325,26 +351,34 @@ export class UserCommand extends Subcommand {
     const packs = await getPacks();
 
     const existingPack = packs.find((pack) => pack.id == packId);
-    if (!existingPack)
+    if (!existingPack) {
       return int.editReply(dedent`
-        ${Emojis.Thinking} The database doesn't contain a pack with id \`${escapeMarkdown(packId)}\`
+        ${Emojis.Thinking} The database doesn't contain a pack with id \`${
+        escapeMarkdown(
+          packId,
+        )
+      }\`
         ${mistakeLine} in ${packsJson}
       `);
+    }
 
     if (
       existingPack.url == data.url &&
       existingPack.file == data.file &&
       existingPack.hash == data.hash
-    )
+    ) {
       return int.editReply(`${Emojis.Thinking} Nothing to change`);
+    }
 
-    if (!extname(data.file))
+    if (!extname(data.file)) {
       return int.editReply(`${Emojis.MindBlown} File extension required`);
-    if (extname(existingPack.file) != extname(data.file))
+    }
+    if (extname(existingPack.file) != extname(data.file)) {
       return int.editReply(dedent`
         ${Emojis.MindBlown} File extension changed! \
         (\`${extname(existingPack.file)}\` -> \`${extname(data.file)}\`)
       `);
+    }
 
     const { id } = await int.fetchReply();
     await PendingUpdatesDB.update((pending) => {

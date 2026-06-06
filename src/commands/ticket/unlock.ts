@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import { isSupportTeam, isTicket, setTicketOpen } from "../../lib/ticket.js";
 import { MessageFlags } from "discord.js";
+import { isSupportTeam, isTicket, setTicketOpen } from "../../lib/ticket.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Makes the person who made a ticket have send message perms",
@@ -18,16 +18,18 @@ export class UserCommand extends Command {
     interaction: Command.ChatInputCommandInteraction,
   ) {
     const { channel } = interaction;
-    if (!isSupportTeam(interaction.member))
+    if (!isSupportTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
-    if (!isTicket(channel))
+    }
+    if (!isTicket(channel)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "not a ticket lol",
       });
+    }
 
     await setTicketOpen(channel, true);
     return interaction.reply({ content: "ticket opened (in theory)" });

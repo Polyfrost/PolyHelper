@@ -4,7 +4,7 @@ import type {
   ContextMenuCommandInteraction,
   Message,
 } from "discord.js";
-import { SkyClient, DevServer, isDevUser } from "../const.js";
+import { DevServer, isDevUser, SkyClient } from "../const.ts";
 
 export class UserPrecondition extends Precondition {
   public override messageRun(message: Message) {

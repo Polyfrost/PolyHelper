@@ -1,9 +1,9 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import { Message, TextChannel } from "discord.js";
-import { isBumpMessage, isStaffPing, isTicket } from "../../lib/ticket.js";
-import { SupportTeams, Users } from "../../const.js";
 import { assert } from "@std/assert";
+import { Message, TextChannel } from "discord.js";
+import { SupportTeams, Users } from "../../const.ts";
+import { isBumpMessage, isStaffPing, isTicket } from "../../lib/ticket.ts";
 
 /**
  * Deletes the "If you do not respond in [...], your ticket will be closed"

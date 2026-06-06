@@ -1,0 +1,39 @@
+{
+  "tasks": {
+    "generate": "deno x sapphire generate",
+    "start": "deno -A src/index.ts"
+  },
+  "lint": {
+    "plugins": ["jsr:@ayk/lint-import-order"]
+  },
+  "imports": {
+    "@octokit/core": "npm:@octokit/core@^7.0.6",
+    "@octokit/rest": "npm:@octokit/rest@^22.0.1",
+    "@sapphire/cli": "npm:@sapphire/cli@^1.9.3",
+    "@sapphire/decorators": "npm:@sapphire/decorators@^6.2.0",
+    "@sapphire/discord.js-utilities": "npm:@sapphire/discord.js-utilities@^7.3.3",
+    "@sapphire/fetch": "npm:@sapphire/fetch@^3.0.5",
+    "@sapphire/framework": "npm:@sapphire/framework@^5.5.0",
+    "@sapphire/plugin-editable-commands": "npm:@sapphire/plugin-editable-commands@^4.0.4",
+    "@sapphire/plugin-subcommands": "npm:@sapphire/plugin-subcommands@^7.0.1",
+    "@sapphire/stopwatch": "npm:@sapphire/stopwatch@^1.5.4",
+    "@sapphire/time-utilities": "npm:@sapphire/time-utilities@^1.7.14",
+    "@sapphire/utilities": "npm:@sapphire/utilities@^3.18.2",
+    "@skyra/env-utilities": "npm:@skyra/env-utilities@^2.0.1",
+    "@std/assert": "jsr:@std/assert@^1.0.19",
+    "@std/encoding": "jsr:@std/encoding@^1.0.10",
+    "@std/fmt": "jsr:@std/fmt@^1.0.10",
+    "@std/text": "jsr:@std/text@^1.0.19",
+    "consola": "npm:consola@^3.4.2",
+    "dedent": "npm:dedent@^1.7.2",
+    "discord.js": "npm:discord.js@^14.26.4",
+    "expiry-map": "npm:expiry-map@^2.0.0",
+    "jszip": "npm:jszip@^3.10.1",
+    "lowdb": "npm:lowdb@^7.0.1",
+    "p-map": "npm:p-map@^7.0.4",
+    "p-memoize": "npm:p-memoize@^8.0.0",
+    "prettier": "npm:prettier@^3.8.3",
+    "remeda": "npm:remeda@^2.37.0",
+    "zod": "npm:zod@^4.4.3"
+  }
+}

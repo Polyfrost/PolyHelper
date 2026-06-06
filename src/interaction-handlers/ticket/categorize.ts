@@ -3,10 +3,10 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from "@sapphire/framework";
+import dedent from "dedent";
 import type { ButtonInteraction } from "discord.js";
 import { ButtonStyle, ComponentType } from "discord.js";
-import { isTicket, setTicketOpen } from "../../lib/ticket.js";
-import dedent from "dedent";
+import { isTicket, setTicketOpen } from "../../lib/ticket.ts";
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Button,
@@ -25,10 +25,9 @@ export class ButtonHandler extends InteractionHandler {
       other: "Other",
     }[ticketType];
     const ticketTypeDesc = `**Ticket category**: ${ticketTypeName}`;
-    if (ticketType == "crash")
+    if (ticketType == "crash") {
       return interaction.update({
-        content:
-          ticketTypeDesc +
+        content: ticketTypeDesc +
           "\nSo we can fix your crash, what do you see when you crash?",
         components: [
           {
@@ -61,7 +60,7 @@ export class ButtonHandler extends InteractionHandler {
           },
         ],
       });
-    else if (ticketType == "modsUpdating") {
+    } else if (ticketType == "modsUpdating") {
       await setTicketOpen(channel, true);
       return interaction.update({
         content: ticketTypeDesc,
@@ -96,8 +95,9 @@ export class ButtonHandler extends InteractionHandler {
   }
 
   public override parse(interaction: ButtonInteraction) {
-    if (!interaction.customId.startsWith("ticketCategorize|"))
+    if (!interaction.customId.startsWith("ticketCategorize|")) {
       return this.none();
+    }
     return this.some();
   }
 }

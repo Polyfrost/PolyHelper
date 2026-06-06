@@ -1,4 +1,5 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { isTextBasedChannel } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
 import {
   ButtonBuilder,
@@ -13,7 +14,6 @@ import {
   unorderedList,
 } from "discord.js";
 import { assetsBase, EmojiIDs } from "../../const.ts";
-import { isTextBasedChannel } from "@sapphire/discord.js-utilities";
 
 const windowsURL = "https://github.com/nacrt/SkyblockClient/releases/latest";
 const javaURL =
@@ -29,7 +29,7 @@ export class UserCommand extends Command {
     registry.registerChatInputCommand((builder) =>
       builder //
         .setName(this.name)
-        .setDescription(this.description),
+        .setDescription(this.description)
     );
   }
 

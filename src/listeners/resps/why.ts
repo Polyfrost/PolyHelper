@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import { Message } from "discord.js";
-import { shrug } from "../../const.js";
+import { shrug } from "../../const.ts";
 
 /** Corrects incorrect commands */
 @ApplyOptions<Listener.Options>({

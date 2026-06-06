@@ -1,9 +1,9 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
-import { ComponentType, ButtonStyle, GuildChannel } from "discord.js";
-import { isTicket, setTicketOpen } from "../../lib/ticket.js";
-import { notSkyClient } from "../../preconditions/notPublic.js";
-import { pinTop } from "./maintain.js";
+import { ButtonStyle, ComponentType, GuildChannel } from "discord.js";
+import { isTicket, setTicketOpen } from "../../lib/ticket.ts";
+import { notSkyClient } from "../../preconditions/notPublic.ts";
+import { pinTop } from "./maintain.ts";
 
 /** Requires the user to choose a category for their ticket */
 @ApplyOptions<Listener.Options>({
@@ -15,6 +15,7 @@ export class UserEvent extends Listener<typeof Events.ChannelCreate> {
     await pinTop(channel);
 
     if (notSkyClient(channel.guildId)) return;
+    if (!channel.isSendable()) return;
 
     await setTicketOpen(channel, false);
     // TODO: Adapt for Polyforst

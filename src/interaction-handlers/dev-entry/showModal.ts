@@ -1,4 +1,5 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { isGuildMember } from "@sapphire/discord.js-utilities";
 import {
   InteractionHandler,
   InteractionHandlerTypes,
@@ -13,9 +14,8 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { Polyfrost } from "../../const.ts";
-import { isGuildMember } from "@sapphire/discord.js-utilities";
 import { MessageFlags } from "discord.js";
+import { Polyfrost } from "../../const.ts";
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Button,
@@ -26,11 +26,12 @@ export class ButtonHandler extends InteractionHandler {
     const { member } = interaction;
     if (!isGuildMember(member)) return false;
 
-    if (member.roles.cache.has(Polyfrost.roles.DevAccess))
+    if (member.roles.cache.has(Polyfrost.roles.DevAccess)) {
       return await interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "You already have access to the Development channels.",
       });
+    }
 
     return await interaction.showModal(
       new ModalBuilder()

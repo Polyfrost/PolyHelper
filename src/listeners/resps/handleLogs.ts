@@ -1,24 +1,24 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { fetch, FetchResultTypes } from "@sapphire/fetch";
 import { Events, Listener } from "@sapphire/framework";
+import { filterNullAndUndefined } from "@sapphire/utilities";
+import { format as formatBytes } from "@std/fmt/bytes";
 import consola from "consola";
-import { getJSON } from "../../lib/data.js";
 import {
   type APIEmbed,
   type APIEmbedField,
+  blockQuote,
   ButtonStyle,
   Colors,
   ComponentType,
   Message,
   type MessageActionRowComponentData,
-  blockQuote,
 } from "discord.js";
-import { z } from "zod";
-import { SkyClient } from "../../const.js";
-import { Log, postLog, maxSize } from "../../lib/mcLogs.js";
-import { FetchResultTypes, fetch } from "@sapphire/fetch";
-import { filterNullAndUndefined } from "@sapphire/utilities";
-import { format as formatBytes } from "@std/fmt/bytes";
 import * as R from "remeda";
+import { z } from "zod";
+import { SkyClient } from "../../const.ts";
+import { getJSON } from "../../lib/data.ts";
+import { Log, maxSize, postLog } from "../../lib/mcLogs.ts";
 
 const mclogsLogo = "https://mclo.gs/img/logo.png";
 const mclogsRegex = /https:\/\/(?:mclo\.gs|api.mclo\.gs\/1\/raw)\/([a-z0-9]+)/i;
@@ -85,13 +85,14 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
         footer: { text: footer },
       });
 
-      if (insights.id == "unknown/unknown" || insights.id == "vanilla/server")
+      if (insights.id == "unknown/unknown" || insights.id == "vanilla/server") {
         embeds.push({
           title: "This may be an incomplete log",
           color: Colors.Yellow,
           description:
             "If you're using Prism or Modrinth Launcher, please upload fml-client-latest.",
         });
+      }
 
       components.push(
         {
@@ -134,15 +135,14 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     await message.channel.send({
       content,
       embeds,
-      components:
-        components.length > 0
-          ? [
-              {
-                type: ComponentType.ActionRow,
-                components,
-              },
-            ]
-          : [],
+      components: components.length > 0
+        ? [
+          {
+            type: ComponentType.ActionRow,
+            components,
+          },
+        ]
+        : [],
       allowedMentions: { parse: [] },
     });
   }
@@ -238,7 +238,7 @@ async function verbalizeCrash(
           info.fix
             .replaceAll("%pathindicator%", pathIndicator)
             .replaceAll("%gameroot%", gameRoot)
-            .replaceAll("%profileroot%", profileRoot),
+            .replaceAll("%profileroot%", profileRoot)
         ),
         R.unique(),
         R.join("\n"),

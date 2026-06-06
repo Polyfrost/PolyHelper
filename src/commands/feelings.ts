@@ -2,7 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import dedent from "dedent";
 import { ApplicationCommandOptionType } from "discord.js";
-import { isSupportTeam } from "../lib/ticket.js";
+import { isSupportTeam } from "../lib/ticket.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Bots have feelings too",
@@ -37,10 +37,9 @@ export class UserCommand extends Command {
     interaction: Command.ChatInputCommandInteraction,
   ) {
     const mention = interaction.options.getUser("mention", false);
-    const mentionText =
-      isSupportTeam(interaction.member) && mention
-        ? `${mention.toString()} `
-        : "";
+    const mentionText = isSupportTeam(interaction.member) && mention
+      ? `${mention.toString()} `
+      : "";
 
     let reply = dedent`
       I may be a bot, but that doesn't mean I don't have feelings.
@@ -54,6 +53,6 @@ export class UserCommand extends Command {
       case "solution":
         reply += "(I already gave you the solution to your problem)";
     }
-    return interaction.reply(reply);
+    return await interaction.reply(reply);
   }
 }

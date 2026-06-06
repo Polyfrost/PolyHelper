@@ -1,9 +1,12 @@
-import { Events, Listener, container } from "@sapphire/framework";
-import consola from "consola";
-import { DiscordAPIError, roleMention } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
-import { SupportTeams, Users } from "../../const.js";
-import { TextChannel } from "discord.js";
+import { container, Events, Listener } from "@sapphire/framework";
+import { Stopwatch } from "@sapphire/stopwatch";
+import { Duration, Time } from "@sapphire/time-utilities";
+import consola from "consola";
+import dedent from "dedent";
+import { DiscordAPIError, roleMention, TextChannel } from "discord.js";
+import pMap from "p-map";
+import { SupportTeams, Users } from "../../const.ts";
 import {
   getTicketOwner,
   getTicketTop,
@@ -11,12 +14,8 @@ import {
   isPinned,
   isStaffPing,
   isTicket,
-} from "../../lib/ticket.js";
-import { Duration, Time } from "@sapphire/time-utilities";
-import { Stopwatch } from "@sapphire/stopwatch";
-import pMap from "p-map";
-import { expireBumps } from "./expireBumps.js";
-import dedent from "dedent";
+} from "../../lib/ticket.ts";
+import { expireBumps } from "./expireBumps.ts";
 
 @ApplyOptions<Listener.Options>({
   once: true,
@@ -48,7 +47,7 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
 
     setInterval(() => {
       getTickets().then((tickets) =>
-        pMap(tickets, expireTicket, { concurrency: 3 }),
+        pMap(tickets, expireTicket, { concurrency: 3 })
       );
     }, Time.Second * 30);
   }
@@ -77,7 +76,7 @@ async function expireTicket(ticket: TextChannel) {
   try {
     const support = SupportTeams[ticket.guildId];
     if (!support) return;
-    if (await isPinned(ticket)) return;
+    if (isPinned(ticket)) return;
 
     const messages = await ticket.messages.fetch();
     const lastMsg = messages
@@ -96,25 +95,27 @@ async function expireTicket(ticket: TextChannel) {
       const ownerId = await getTicketOwner(ticket);
       if (ownerId) {
         const owner = ticket.guild.members.resolve(ownerId);
-        if (!owner)
+        if (!owner) {
           return void pingStaff(
             ticket,
             dedent`Owner left. Please close ticket.
             (I don't have hands to do it myself...)`,
           );
+        }
       }
     } else if (isBumpMessage(lastMsg)) {
       const twoDays = new Duration("2d").dateFrom(lastMsg.createdAt);
       if (twoDays < new Date()) return void pingStaff(ticket, "Time to close");
     }
   } catch (e) {
-    const header = `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
+    const header =
+      `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
       if (e.code == 50001) return;
       consola.error(header, e.code, e.message);
-    } else if (e instanceof Error && e.name == "ConnectTimeoutError")
+    } else if (e instanceof Error && e.name == "ConnectTimeoutError") {
       consola.error(header, "Connect Timeout Error");
-    else consola.error(header, e);
+    } else consola.error(header, e);
   }
 }
 
@@ -125,7 +126,8 @@ export async function pinTop(ticket: TextChannel) {
     if (!top || top.pinned) return;
     await top.pin();
   } catch (e) {
-    const header = `Failed to pin ticket top in ${ticket.name} in ${ticket.guild.name}:`;
+    const header =
+      `Failed to pin ticket top in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
       if (e.code == 50001) return;
       consola.error(header, e.code, e.message);
@@ -138,5 +140,5 @@ export async function pinTop(ticket: TextChannel) {
 export async function pingStaff(channel: TextChannel, msg: string) {
   const support = SupportTeams[channel.guildId];
   if (!support) return;
-  return channel.send(`${roleMention(support)} ${msg}`);
+  return await channel.send(`${roleMention(support)} ${msg}`);
 }

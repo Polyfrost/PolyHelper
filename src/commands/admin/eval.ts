@@ -1,11 +1,11 @@
+import { inspect } from "node:util";
 import { ApplyOptions } from "@sapphire/decorators";
-import { Command, type Args } from "@sapphire/framework";
-import { send } from "@sapphire/plugin-editable-commands";
+import { type Args, Command } from "@sapphire/framework";
 // import { Type } from "@sapphire/type";
+import { send } from "@sapphire/plugin-editable-commands";
 import { codeBlock, isThenable } from "@sapphire/utilities";
-import type { Message } from "discord.js";
-import { inspect } from "util";
 import consola from "consola";
+import type { Message } from "discord.js";
 
 @ApplyOptions<Command.Options>({
   aliases: ["ev"],
@@ -35,7 +35,8 @@ export class UserCommand extends Command {
 
     if (output.length > 2000) {
       return send(message, {
-        content: `Output was too long... sent the result as a file.\n${typeFooter}`,
+        content:
+          `Output was too long... sent the result as a file.\n${typeFooter}`,
         files: [{ attachment: Buffer.from(result), name: "output.js" }],
       });
     }
@@ -50,8 +51,7 @@ export class UserCommand extends Command {
   ) {
     if (flags.async) code = `(async () => {\n${code}\n})();`;
 
-    // @ts-expect-error shortcuts for eval
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // deno-lint-ignore no-unused-vars
     const { channel, guild, client, author } = message;
 
     let success = true;

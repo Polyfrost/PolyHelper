@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import { Mod, getMods } from "../../lib/data.js";
 import { inlineCode, unorderedList } from "discord.js";
+import { getMods, Mod } from "../../lib/data.ts";
 
 enum ModType {
   Bundle,
@@ -31,10 +31,10 @@ export class UserCommand extends Command {
       mod.packages
         ? ModType.Bundle
         : mod.categories?.includes("2;All Skyblock")
-          ? ModType.Skyblock
-          : mod.categories?.includes("5;All PvP")
-            ? ModType.PvP
-            : ModType.Other;
+        ? ModType.Skyblock
+        : mod.categories?.includes("5;All PvP")
+        ? ModType.PvP
+        : ModType.Other;
     const formatMods = (type: ModType) =>
       unorderedList(
         mods
@@ -51,9 +51,8 @@ export class UserCommand extends Command {
           return `${mod.display}: ` + mods;
         }),
     );
-    const color =
-      (await interaction.guild?.members.fetch(interaction.user))
-        ?.displayColor || 0x8ff03f;
+    const color = (await interaction.guild?.members.fetch(interaction.user))
+      ?.displayColor || 0x8ff03f;
     return interaction.reply({
       embeds: [
         { color, title: "Bundles", description: bundleStr },

@@ -1,9 +1,9 @@
 import {
-  type FunctionFallback,
   createFunctionPrecondition,
+  type FunctionFallback,
 } from "@sapphire/decorators";
 import { BaseInteraction, Message } from "discord.js";
-import { SkyClient } from "../const.js";
+import { SkyClient } from "../const.ts";
 
 export function SkyClientOnly(
   fallback: FunctionFallback = (): void => undefined,

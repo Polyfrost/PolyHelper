@@ -122,7 +122,7 @@ async function createBinaryBlob(
   content: ArrayBuffer,
 ) {
   const base64Content = Buffer.from(content).toString("base64");
-  return createBlob(owner, repo, base64Content, "base64");
+  return await createBlob(owner, repo, base64Content, "base64");
 }
 
 async function createTree(
@@ -244,15 +244,18 @@ export async function commitFiles(
 
 async function _getRepoCount() {
   let count = 0;
-  for await (const { data: page } of octokitAnon.paginate.iterator(
-    octokitAnon.rest.repos.listForOrg,
-    {
-      org: "Polyfrost",
-      type: "public",
-      per_page: 100,
-    },
-  ))
+  for await (
+    const { data: page } of octokitAnon.paginate.iterator(
+      octokitAnon.rest.repos.listForOrg,
+      {
+        org: "Polyfrost",
+        type: "public",
+        per_page: 100,
+      },
+    )
+  ) {
     count += page.length;
+  }
   return count;
 }
 export const getRepoCount = pMemoize(_getRepoCount, {

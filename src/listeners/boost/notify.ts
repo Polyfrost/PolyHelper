@@ -1,17 +1,17 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { isTextChannel } from "@sapphire/discord.js-utilities";
 import { Events, Listener } from "@sapphire/framework";
 import consola from "consola";
-import {
-  type PartialGuildMember,
-  GuildMember,
-  ButtonBuilder,
-  ActionRowBuilder,
-  ButtonStyle,
-} from "discord.js";
-import { SkyClient } from "../../const.js";
-import { isTextChannel } from "@sapphire/discord.js-utilities";
-import { formatUser } from "../../lib/logHelper.js";
 import dedent from "dedent";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  GuildMember,
+  type PartialGuildMember,
+} from "discord.js";
+import { SkyClient } from "../../const.ts";
+import { formatUser } from "../../lib/logHelper.ts";
 
 /** Tracks when people (un)boost */
 @ApplyOptions<Listener.Options>({
@@ -28,17 +28,20 @@ export class UserEvent extends Listener<typeof Events.GuildMemberUpdate> {
 
     if (oldUser.premiumSince && !user.premiumSince) {
       consola.info("Boost stop", user.id);
-      if (isTextChannel(botLogs))
+      if (isTextChannel(botLogs)) {
         await botLogs.send(`${formatUser(user)} stopped boosting`);
-      if (!user.roles.cache.has(SkyClient.roles.GiveawayDonor))
+      }
+      if (!user.roles.cache.has(SkyClient.roles.GiveawayDonor)) {
         await user.roles.remove(
           SkyClient.roles.GiveawayBypass,
           "Stopped boosting",
         );
+      }
     } else if (!oldUser.premiumSince && user.premiumSince) {
       consola.info("Boost start", user.id);
-      if (isTextChannel(botLogs))
+      if (isTextChannel(botLogs)) {
         await botLogs.send(`${formatUser(user)} started boosting`);
+      }
 
       await user.roles.add(
         SkyClient.roles.GiveawayBypass,

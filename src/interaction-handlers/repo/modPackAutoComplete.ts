@@ -4,15 +4,15 @@ import {
   InteractionHandlerTypes,
 } from "@sapphire/framework";
 import {
-  AutocompleteInteraction,
   type ApplicationCommandOptionChoiceData,
+  AutocompleteInteraction,
 } from "discord.js";
 import {
   Downloadable,
   getMods,
   getPacks,
   probableMatches,
-} from "../../lib/data.js";
+} from "../../lib/data.ts";
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Autocomplete,
@@ -22,7 +22,7 @@ export class AutocompleteHandler extends InteractionHandler {
     interaction: AutocompleteInteraction,
     result: ApplicationCommandOptionChoiceData[],
   ) {
-    return interaction.respond(result);
+    return await interaction.respond(result);
   }
 
   public override async parse(interaction: AutocompleteInteraction) {

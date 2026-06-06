@@ -1,12 +1,12 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import { Discord, Discords, getRepoJSON, queryData } from "../../lib/data.js";
 import {
   ApplicationCommandOptionType,
   EmbedBuilder,
   type InteractionReplyOptions,
 } from "discord.js";
-import { repoFilesURL } from "../../const.js";
+import { repoFilesURL } from "../../const.ts";
+import { Discord, Discords, getRepoJSON, queryData } from "../../lib/data.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Gives the link to a discord",
@@ -46,10 +46,11 @@ export function getDiscordEmbed(item: Discord): InteractionReplyOptions {
     color: 0x8ff03f,
     title: item.fancyname,
   });
-  if (item.icon)
+  if (item.icon) {
     embed.setThumbnail(
       `${repoFilesURL}/discords/${encodeURIComponent(item.icon)}`,
     );
+  }
   if (item.description) embed.setDescription(item.description);
 
   return {

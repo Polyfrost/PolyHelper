@@ -1,8 +1,8 @@
-import { Events, Listener } from "@sapphire/framework";
-import { type Client, type PresenceStatusData } from "discord.js";
 import { ApplyOptions } from "@sapphire/decorators";
+import { Events, Listener } from "@sapphire/framework";
 import { Time } from "@sapphire/time-utilities";
 import { pickRandom } from "@sapphire/utilities";
+import { type Client, type PresenceStatusData } from "discord.js";
 
 @ApplyOptions<Listener.Options>({
   once: true,

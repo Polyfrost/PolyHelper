@@ -1,15 +1,15 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import consola from "consola";
+import dedent from "dedent";
 import {
   ApplicationCommandOptionType,
   channelMention,
   MessageFlags,
 } from "discord.js";
 import { Polyfrost, SkyClient } from "../const.ts";
-import { getMCProfile } from "../lib/mcAPI.ts";
 import { BoostersDB } from "../lib/db.ts";
-import dedent from "dedent";
+import { getMCProfile } from "../lib/mcAPI.ts";
 import { isSupporter } from "../listeners/boost/maintain.ts";
 
 @ApplyOptions<Command.Options>({
@@ -38,12 +38,13 @@ export class UserCommand extends Command {
 
     const mcName = interaction.options.getString("username", true);
     const profile = await getMCProfile(mcName);
-    if (!profile)
+    if (!profile) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content:
           "Couldn't find this Minecraft account. Did you type it correctly?",
       });
+    }
 
     consola.info(
       "Saving Supporter",
@@ -55,7 +56,7 @@ export class UserCommand extends Command {
       data[interaction.user.id] = profile.id;
     });
 
-    if (supporter)
+    if (supporter) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: dedent`
@@ -65,7 +66,7 @@ export class UserCommand extends Command {
           -# If you don't see it, you may have to type \`/scc reload\` in game.
         `,
       });
-    else if (interaction.guildId == SkyClient.id)
+    } else if (interaction.guildId == SkyClient.id) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: dedent`
@@ -73,7 +74,7 @@ export class UserCommand extends Command {
           Give us a boost to receive an in-game role with SkyClient Cosmetics!
         `,
       });
-    else if (interaction.guildId == Polyfrost.id)
+    } else if (interaction.guildId == Polyfrost.id) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: dedent`
@@ -82,11 +83,12 @@ export class UserCommand extends Command {
           Find out more here: ${channelMention(Polyfrost.channels.PatreonAd)}
         `,
       });
-    // This will happen in DMs
-    else
+    } // This will happen in DMs
+    else {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "**You don't appear to be supporting us.**",
       });
+    }
   }
 }

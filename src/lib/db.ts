@@ -1,8 +1,8 @@
+import * as fs from "node:fs/promises";
+import { join } from "node:path";
 import { envParseString } from "@skyra/env-utilities";
 import { type Snowflake } from "discord.js";
-import * as fs from "fs/promises";
 import { JSONFilePreset } from "lowdb/node";
-import { join } from "path";
 
 const baseDir = envParseString("DB_DIR", "db");
 

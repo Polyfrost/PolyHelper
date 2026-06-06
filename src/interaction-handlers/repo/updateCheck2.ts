@@ -3,49 +3,49 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from "@sapphire/framework";
+import { envParseString } from "@skyra/env-utilities";
+import { assert } from "@std/assert";
 import consola from "consola";
+import dedent from "dedent";
 import {
+  type APIMessageTopLevelComponent,
   BaseInteraction,
   ButtonBuilder,
+  type ButtonInteraction,
   ButtonStyle,
   Colors,
   ContainerBuilder,
+  type JSONEncodable,
+  type MessageEditOptions,
   MessageFlags,
   SectionBuilder,
   SeparatorBuilder,
   TextDisplayBuilder,
   unorderedList,
   userMention,
-  type APIMessageTopLevelComponent,
-  type ButtonInteraction,
-  type JSONEncodable,
-  type MessageEditOptions,
 } from "discord.js";
 import { format } from "prettier";
-import { hasPermission } from "../../lib/update.js";
-import { notSkyClient } from "../../preconditions/notPublic.js";
+import { repoURL } from "../../const.ts";
 import {
+  invalidateTrackedData,
   Mod,
   Mods,
   Pack,
   Packs,
-  invalidateTrackedData,
-} from "../../lib/data.js";
+} from "../../lib/data.ts";
 import {
-  PendingUpdatesDB,
   type ModUpdate,
   type PackUpdate,
   type PartialUpdate,
-} from "../../lib/db.js";
-import { envParseString } from "@skyra/env-utilities";
+  PendingUpdatesDB,
+} from "../../lib/db.ts";
 import {
   commitFiles,
-  readGHContent,
   type FileToCommit,
+  readGHContent,
 } from "../../lib/GHAPI.ts";
-import dedent from "dedent";
-import { assert } from "@std/assert";
-import { repoURL } from "../../const.ts";
+import { hasPermission } from "../../lib/update.ts";
+import { notSkyClient } from "../../preconditions/notPublic.ts";
 
 const owner = "SkyBlockClient";
 const repo = "SkyblockClient-REPO";
@@ -64,17 +64,19 @@ export class ButtonHandler extends InteractionHandler {
     const data = PendingUpdatesDB.data[message.id];
     assert(member && data);
 
-    if (!(await hasPermission(member, "approve", data.type, data.id)))
+    if (!(await hasPermission(member, "approve", data.type, data.id))) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "You can't approve this update",
       });
+    }
 
-    if (data.approvers.some(({ id }) => id == interaction.user.id))
+    if (data.approvers.some(({ id }) => id == interaction.user.id)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "You already approved this update",
       });
+    }
 
     const approver = { name: member.user.tag, id: member.user.id };
     await PendingUpdatesDB.update((data) => {
@@ -107,8 +109,9 @@ export class ButtonHandler extends InteractionHandler {
         const fileResp = await fetch(data.url, {
           headers: { "User-Agent": repoURL },
         });
-        if (!fileResp.ok)
+        if (!fileResp.ok) {
           throw new Error(`${fileResp.statusText} while fetching ${data.url}`);
+        }
         fileData = await fileResp.arrayBuffer();
       } catch (e) {
         consola.error("Failed to download file", e);
@@ -124,7 +127,8 @@ export class ButtonHandler extends InteractionHandler {
 
       const path = `files/${data.type}s/${data.file}`;
       changes.push({ path, content: fileData });
-      data.url = `https://github.com/SkyblockClient/SkyblockClient-REPO/raw/main/${path}`;
+      data.url =
+        `https://github.com/SkyblockClient/SkyblockClient-REPO/raw/main/${path}`;
     }
 
     await message.edit(
@@ -135,10 +139,9 @@ export class ButtonHandler extends InteractionHandler {
       ),
     );
 
-    const itemName =
-      data.type == "mod"
-        ? await updateMod(data, changes)
-        : await updatePack(data, changes);
+    const itemName = data.type == "mod"
+      ? await updateMod(data, changes)
+      : await updatePack(data, changes);
     const displayName = `${itemName} (\`${data.id}\`)`;
 
     try {
@@ -149,7 +152,11 @@ export class ButtonHandler extends InteractionHandler {
         dedent`
           Update ${data.type} ${displayName}
           Approved by:
-          ${unorderedList(data.approvers.map(({ name, id }) => `${name} (${id})`))}
+          ${
+          unorderedList(
+            data.approvers.map(({ name, id }) => `${name} (${id})`),
+          )
+        }
         `,
         changes,
       );
@@ -221,7 +228,7 @@ async function updateMod(data: ModUpdate, changes: FileToCommit[]) {
         tabWidth: 4,
       }),
     });
-  } else
+  } else {
     changes.push({
       path: "files/mods.json",
       content: await format(JSON.stringify(mods), {
@@ -229,6 +236,7 @@ async function updateMod(data: ModUpdate, changes: FileToCommit[]) {
         tabWidth: 4,
       }),
     });
+  }
 
   return retName;
 }
@@ -289,11 +297,11 @@ export function generateApproversComponent(data: PartialUpdate) {
   const { approvers } = data;
 
   const container = new ContainerBuilder();
-  if (isUpdateApproved(data))
+  if (isUpdateApproved(data)) {
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent("## Approvers"),
     );
-  else
+  } else {
     container.addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(
@@ -306,6 +314,7 @@ export function generateApproversComponent(data: PartialUpdate) {
             .setCustomId("updateCheck2"),
         ),
     );
+  }
   container
     .addSeparatorComponents(new SeparatorBuilder())
     .addTextDisplayComponents(
@@ -339,11 +348,13 @@ export function generateMessage(
 ): MessageEditOptions {
   const { approvers } = data;
   const approved = isUpdateApproved(data);
-  const approvedOwn =
-    approved || approvers.map(({ id }) => id).includes(int.user.id);
-  const ratURL = `https://ktibow.github.io/RatRater2/?rat-to-peer-url=${encodeURIComponent(
-    data.url,
-  )}`;
+  const approvedOwn = approved ||
+    approvers.map(({ id }) => id).includes(int.user.id);
+  const ratURL = `https://ktibow.github.io/RatRater2/?rat-to-peer-url=${
+    encodeURIComponent(
+      data.url,
+    )
+  }`;
 
   const components: JSONEncodable<APIMessageTopLevelComponent>[] = [];
   if (!approved) {
@@ -365,12 +376,13 @@ export function generateMessage(
         "**(rat-to-peer may take a bit to boot up but it'll load within 15 seconds)**",
       ),
     );
-    if (!approvedOwn)
+    if (!approvedOwn) {
       components.push(
         new TextDisplayBuilder().setContent(
           `${int.user.toString()} don't forget to approve your own update`,
         ),
       );
+    }
   }
   return {
     flags: MessageFlags.IsComponentsV2,

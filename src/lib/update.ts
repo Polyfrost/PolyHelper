@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
-import { getRepoJSON } from "./data.js";
 import { z } from "zod";
-import { SkyClient, isDevUser, Users } from "../const.js";
+import { isDevUser, SkyClient, Users } from "../const.ts";
+import { getRepoJSON } from "./data.ts";
 
 const Permission = z.enum(["update", "approve"]);
 type Permission = z.infer<typeof Permission>;
@@ -19,13 +19,14 @@ export const getUpdatePerms = async () =>
 export async function checkMember(member: GuildMember): Promise<
   | { all: true }
   | {
-      all: false;
-      mods: Record<string, Permission>;
-      packs: Record<string, Permission>;
-    }
+    all: false;
+    mods: Record<string, Permission>;
+    packs: Record<string, Permission>;
+  }
 > {
-  if (member.roles.cache.has(SkyClient.roles.GitHubKeeper))
+  if (member.roles.cache.has(SkyClient.roles.GitHubKeeper)) {
     return { all: true };
+  }
   if (isDevUser && member.id == Users.BotDev) return { all: true };
 
   const owners = await getUpdatePerms();

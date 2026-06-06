@@ -1,18 +1,18 @@
-import {
-  EmbedBuilder,
-  Message,
-  escapeMarkdown,
-  unorderedList,
-} from "discord.js";
-import { Polyfrost, SkyClient } from "../../const.js";
-import { Events, Listener } from "@sapphire/framework";
-import consola from "consola";
 import { ApplyOptions } from "@sapphire/decorators";
 import {
   isGuildBasedChannel,
   isTextChannel,
 } from "@sapphire/discord.js-utilities";
-import { isTicket } from "../../lib/ticket.js";
+import { Events, Listener } from "@sapphire/framework";
+import consola from "consola";
+import {
+  EmbedBuilder,
+  escapeMarkdown,
+  Message,
+  unorderedList,
+} from "discord.js";
+import { Polyfrost, SkyClient } from "../../const.ts";
+import { isTicket } from "../../lib/ticket.ts";
 
 const streaks: Record<string, string[]> = {};
 const ignoredChannels = [

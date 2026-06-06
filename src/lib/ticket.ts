@@ -3,20 +3,21 @@ import {
   isGuildMember,
   isTextChannel,
 } from "@sapphire/discord.js-utilities";
-import consola from "consola";
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
+import consola from "consola";
 import { Message, roleMention, TextChannel } from "discord.js";
 import pMemoize from "p-memoize";
-import { formatChannel } from "./logHelper.js";
-import { DevServer, Polyfrost, SkyClient, SupportTeams } from "../const.js";
+import { DevServer, Polyfrost, SkyClient, SupportTeams } from "../const.ts";
+import { formatChannel } from "./logHelper.ts";
 
 export async function setTicketOpen(
   channel: ChannelTypes,
   open: boolean = true,
 ) {
-  if (open == undefined || open == null)
+  if (open == undefined || open == null) {
     throw new Error(`open undefined WHY IS THIS HAPPENING`);
+  }
   const header = `${open ? "Opening" : "Closing"} ${formatChannel(channel)}`;
   if (!isTicket(channel)) {
     consola.warn(header, "Not a ticket");
@@ -72,8 +73,9 @@ export function isTicket(
   channel: ChannelTypes | Nullish,
 ): channel is TextChannel {
   if (!isTextChannel(channel)) return false;
-  if (channel.name == "ticket-logs" || channel.name == "ticket-transcripts")
+  if (channel.name == "ticket-logs" || channel.name == "ticket-transcripts") {
     return false;
+  }
   if (channel.name.startsWith("ticket-")) return true;
   if (channel.parentId == Polyfrost.categories.BugReports) return true;
   return false;
@@ -109,9 +111,9 @@ export function isStaffPing(msg: Message) {
   );
 }
 
-export async function findDoNotCloseChannel(
+export function findDoNotCloseChannel(
   channel: TextChannel,
-): Promise<TextChannel | undefined> {
+): TextChannel | undefined {
   return channel.parent?.children
     .valueOf()
     .find(
@@ -120,8 +122,8 @@ export async function findDoNotCloseChannel(
     );
 }
 
-export async function isPinned(channel: TextChannel): Promise<boolean> {
-  const doNotCloseChannel = await findDoNotCloseChannel(channel);
+export function isPinned(channel: TextChannel): boolean {
+  const doNotCloseChannel = findDoNotCloseChannel(channel);
   if (!doNotCloseChannel) return false;
   return channel.position < doNotCloseChannel.position;
 }

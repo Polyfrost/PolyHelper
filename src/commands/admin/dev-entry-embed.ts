@@ -1,5 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
+import { isTextBasedChannel } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
+import dedent from "dedent";
 import {
   ButtonBuilder,
   ButtonStyle,
@@ -8,8 +10,6 @@ import {
   SectionBuilder,
   TextDisplayBuilder,
 } from "discord.js";
-import { isTextBasedChannel } from "@sapphire/discord.js-utilities";
-import dedent from "dedent";
 import { Polyfrost } from "../../const.ts";
 
 const header = dedent`
@@ -37,7 +37,7 @@ export class UserCommand extends Command {
     registry.registerChatInputCommand((builder) =>
       builder //
         .setName(this.name)
-        .setDescription(this.description),
+        .setDescription(this.description)
     );
   }
 
@@ -47,11 +47,12 @@ export class UserCommand extends Command {
     const { channel } = interaction;
     if (!isTextBasedChannel(channel)) return;
 
-    if (interaction.guildId != Polyfrost.id)
+    if (interaction.guildId != Polyfrost.id) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Polyfrost only",
       });
+    }
 
     await channel.send({
       flags: MessageFlags.IsComponentsV2,

@@ -1,15 +1,15 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
+import dedent from "dedent";
+import { ApplicationCommandOptionType, MessageFlags } from "discord.js";
 import {
   getDistance,
   getDownloadableMessage,
   getMods,
   probableMatches,
   queryData,
-} from "../../lib/data.js";
-import { ApplicationCommandOptionType, MessageFlags } from "discord.js";
-import { isSupportTeam } from "../../lib/ticket.js";
-import dedent from "dedent";
+} from "../../lib/data.ts";
+import { isSupportTeam } from "../../lib/ticket.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Gives info about a mod",
@@ -65,8 +65,9 @@ export class UserCommand extends Command {
     if (!item) {
       const best = probableMatches(items, query)[0];
       let reply = "Mod not found.";
-      if (best && getDistance(best, query) <= 3)
+      if (best && getDistance(best, query) <= 3) {
         reply += `\nDid you mean ${best.display}?`;
+      }
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: reply,
@@ -76,7 +77,7 @@ export class UserCommand extends Command {
     let bundledIn: string | undefined;
     if (item.hidden) {
       bundledIn = items.find((otherItem) =>
-        otherItem.packages?.includes(item.id),
+        otherItem.packages?.includes(item.id)
       )?.display;
     }
 
@@ -86,7 +87,8 @@ export class UserCommand extends Command {
     let instText = "";
     switch (interaction.options.getString("instructions", false)) {
       case "download":
-        instText = `Download ${item.display} below and add it to your \`mods\` folder.`;
+        instText =
+          `Download ${item.display} below and add it to your \`mods\` folder.`;
         break;
       case "update":
         instText = "\n";
@@ -98,12 +100,14 @@ export class UserCommand extends Command {
         break;
       case "config": {
         const { command } = item;
-        if (!command)
+        if (!command) {
           return interaction.reply({
             flags: MessageFlags.Ephemeral,
             content: `${item.display} doesn't have a config command!`,
           });
-        instText = `You can configure ${item.display} using the command \`${command}\` in-game.`;
+        }
+        instText =
+          `You can configure ${item.display} using the command \`${command}\` in-game.`;
       }
     }
 
@@ -112,8 +116,9 @@ export class UserCommand extends Command {
       reply.content = `${pingText} ${instText}`;
       reply.allowedMentions = { users: ping ? [ping.id] : [] };
     }
-    if (interaction.options.getBoolean("hidden", false))
+    if (interaction.options.getBoolean("hidden", false)) {
       reply.flags = MessageFlags.Ephemeral;
+    }
     return interaction.reply(reply);
   }
 }
