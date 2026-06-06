@@ -1,14 +1,15 @@
-import consola from "consola";
 import { Octokit } from "@octokit/rest";
 import { Time } from "@sapphire/time-utilities";
 import { envParseString } from "@skyra/env-utilities";
 import { assert } from "@std/assert";
+import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
+import consola from "consola";
 import ExpiryMap from "expiry-map";
 import pmap from "p-map";
 import pMemoize from "p-memoize";
-import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
 
 export const octokit = new Octokit({ auth: envParseString("GH_KEY", null) });
+export const octokitAnon = new Octokit();
 export const committer = {
   name: "SkyClient-repo-bot",
   email: "SkyClient-repo-bot@users.noreply.github.com",
@@ -243,8 +244,8 @@ export async function commitFiles(
 
 async function _getRepoCount() {
   let count = 0;
-  for await (const { data: page } of octokit.paginate.iterator(
-    octokit.rest.repos.listForOrg,
+  for await (const { data: page } of octokitAnon.paginate.iterator(
+    octokitAnon.rest.repos.listForOrg,
     {
       org: "Polyfrost",
       type: "public",
