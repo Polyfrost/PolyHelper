@@ -27,13 +27,13 @@
     "consola": "npm:consola@^3.4.2",
     "dedent": "npm:dedent@^1.7.2",
     "discord.js": "npm:discord.js@^14.26.4",
+    "es-toolkit": "npm:es-toolkit@^1.47.0",
     "expiry-map": "npm:expiry-map@^2.0.0",
     "jszip": "npm:jszip@^3.10.1",
     "lowdb": "npm:lowdb@^7.0.1",
     "p-map": "npm:p-map@^7.0.4",
     "p-memoize": "npm:p-memoize@^8.0.0",
     "prettier": "npm:prettier@^3.8.3",
-    "remeda": "npm:remeda@^2.37.0",
     "zod": "npm:zod@^4.4.3"
   }
 }

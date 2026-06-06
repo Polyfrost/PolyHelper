@@ -1,7 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { fetch, FetchResultTypes } from "@sapphire/fetch";
 import { Events, Listener } from "@sapphire/framework";
-import { filterNullAndUndefined } from "@sapphire/utilities";
 import { format as formatBytes } from "@std/fmt/bytes";
 import consola from "consola";
 import {
@@ -14,7 +13,7 @@ import {
   Message,
   type MessageActionRowComponentData,
 } from "discord.js";
-import * as R from "remeda";
+import { isNotNil, uniq } from "es-toolkit";
 import { z } from "zod";
 import { SkyClient } from "../../const.ts";
 import { getJSON } from "../../lib/data.ts";
@@ -135,14 +134,10 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     await message.channel.send({
       content,
       embeds,
-      components: components.length > 0
-        ? [
-          {
-            type: ComponentType.ActionRow,
-            components,
-          },
-        ]
-        : [],
+      components:
+        components.length > 0
+          ? [{ type: ComponentType.ActionRow, components }]
+          : [],
       allowedMentions: { parse: [] },
     });
   }
@@ -232,18 +227,15 @@ async function verbalizeCrash(
     if (!groupInfo.length) return;
     return {
       name: type.name,
-      value: R.pipe(
-        groupInfo,
-        R.map((info) =>
+      value: uniq(
+        groupInfo.map((info) =>
           info.fix
             .replaceAll("%pathindicator%", pathIndicator)
             .replaceAll("%gameroot%", gameRoot)
-            .replaceAll("%profileroot%", profileRoot)
+            .replaceAll("%profileroot%", profileRoot),
         ),
-        R.unique(),
-        R.join("\n"),
-      ),
+      ).join("\n"),
     };
   });
-  return crashGroups.filter(filterNullAndUndefined);
+  return crashGroups.filter(isNotNil);
 }

@@ -3,7 +3,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Events, Listener } from "@sapphire/framework";
 import consola from "consola";
 import { Message } from "discord.js";
-import { isTruthy } from "remeda";
+import { isNotNil } from "es-toolkit";
 import { z } from "zod";
 import { Polyfrost, SkyClient } from "../../const.ts";
 import { buildDeleteBtnRow } from "../../lib/builders.ts";
@@ -20,7 +20,8 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     if (!member) return;
     if (message.author.bot) return;
 
-    let canAutoResp = channel.id == SkyClient.channels.General ||
+    let canAutoResp =
+      channel.id == SkyClient.channels.General ||
       channel.id == SkyClient.channels.SkyblockTalk ||
       channel.id == SkyClient.channels.Support ||
       channel.id == Polyfrost.channels.General ||
@@ -83,5 +84,5 @@ export async function findAutoresps(message: string, isSkyClient: boolean) {
       }
       return;
     })
-    .filter(isTruthy);
+    .filter(isNotNil);
 }
