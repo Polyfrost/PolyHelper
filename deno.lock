@@ -497,8 +497,8 @@
     "isexe@2.0.0": {
       "integrity": "sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw=="
     },
-    "js-yaml@4.1.1": {
-      "integrity": "sha512-qQKT4zQxXl8lLwBtHMWwaTcGfFOZviOJet3Oy/xmGk2gZH677CJM9EvtfdSkgWcATZhj/55JZ0rmy3myCT5lsA==",
+    "js-yaml@4.2.0": {
+      "integrity": "sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==",
       "dependencies": [
         "argparse"
       ],
@@ -712,31 +712,35 @@
       "jsr:@std/assert@^1.0.19",
       "jsr:@std/encoding@^1.0.10",
       "jsr:@std/fmt@^1.0.10",
-      "jsr:@std/text@^1.0.19",
-      "npm:@octokit/core@^7.0.6",
-      "npm:@octokit/rest@^22.0.1",
-      "npm:@sapphire/cli@^1.9.3",
-      "npm:@sapphire/decorators@^6.2.0",
-      "npm:@sapphire/discord.js-utilities@^7.3.3",
-      "npm:@sapphire/fetch@^3.0.5",
-      "npm:@sapphire/framework@^5.5.0",
-      "npm:@sapphire/plugin-editable-commands@^4.0.4",
-      "npm:@sapphire/plugin-subcommands@^7.0.1",
-      "npm:@sapphire/stopwatch@^1.5.4",
-      "npm:@sapphire/time-utilities@^1.7.14",
-      "npm:@sapphire/utilities@^3.18.2",
-      "npm:@skyra/env-utilities@^2.0.1",
-      "npm:consola@^3.4.2",
-      "npm:dedent@^1.7.2",
-      "npm:discord.js@^14.26.4",
-      "npm:es-toolkit@^1.47.0",
-      "npm:expiry-map@2",
-      "npm:jszip@^3.10.1",
-      "npm:lowdb@^7.0.1",
-      "npm:p-map@^7.0.4",
-      "npm:p-memoize@8",
-      "npm:prettier@^3.8.3",
-      "npm:zod@^4.4.3"
-    ]
+      "jsr:@std/text@^1.0.19"
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:@octokit/core@^7.0.6",
+        "npm:@octokit/rest@^22.0.1",
+        "npm:@sapphire/cli@^1.9.3",
+        "npm:@sapphire/decorators@^6.2.0",
+        "npm:@sapphire/discord.js-utilities@^7.3.3",
+        "npm:@sapphire/fetch@^3.0.5",
+        "npm:@sapphire/framework@^5.5.0",
+        "npm:@sapphire/plugin-editable-commands@^4.0.4",
+        "npm:@sapphire/plugin-subcommands@^7.0.1",
+        "npm:@sapphire/stopwatch@^1.5.4",
+        "npm:@sapphire/time-utilities@^1.7.14",
+        "npm:@sapphire/utilities@^3.18.2",
+        "npm:@skyra/env-utilities@^2.0.1",
+        "npm:consola@^3.4.2",
+        "npm:dedent@^1.7.2",
+        "npm:discord.js@^14.26.4",
+        "npm:es-toolkit@^1.47.0",
+        "npm:expiry-map@2",
+        "npm:jszip@^3.10.1",
+        "npm:lowdb@^7.0.1",
+        "npm:p-map@^7.0.4",
+        "npm:p-memoize@8",
+        "npm:prettier@^3.8.3",
+        "npm:zod@^4.4.3"
+      ]
+    }
   }
 }

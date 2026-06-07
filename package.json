@@ -1,0 +1,34 @@
+{
+  "name": "skyanswers",
+  "main": "src/index.ts",
+  "author": "SkyClient",
+  "type": "module",
+  "dependencies": {
+    "@octokit/core": "^7.0.6",
+    "@octokit/rest": "^22.0.1",
+    "@sapphire/decorators": "^6.2.0",
+    "@sapphire/discord.js-utilities": "^7.3.3",
+    "@sapphire/fetch": "^3.0.5",
+    "@sapphire/framework": "^5.5.0",
+    "@sapphire/plugin-editable-commands": "^4.0.4",
+    "@sapphire/plugin-subcommands": "^7.0.1",
+    "@sapphire/stopwatch": "^1.5.4",
+    "@sapphire/time-utilities": "^1.7.14",
+    "@sapphire/utilities": "^3.18.2",
+    "@skyra/env-utilities": "^2.0.1",
+    "consola": "^3.4.2",
+    "dedent": "^1.7.2",
+    "discord.js": "^14.26.4",
+    "es-toolkit": "^1.47.0",
+    "expiry-map": "^2.0.0",
+    "jszip": "^3.10.1",
+    "lowdb": "^7.0.1",
+    "p-map": "^7.0.4",
+    "p-memoize": "^8.0.0",
+    "prettier": "^3.8.3",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@sapphire/cli": "^1.9.3"
+  }
+}
