@@ -20,8 +20,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     if (!member) return;
     if (message.author.bot) return;
 
-    let canAutoResp =
-      channel.id == SkyClient.channels.General ||
+    let canAutoResp = channel.id == SkyClient.channels.General ||
       channel.id == SkyClient.channels.SkyblockTalk ||
       channel.id == SkyClient.channels.Support ||
       channel.id == Polyfrost.channels.General ||

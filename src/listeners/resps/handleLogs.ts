@@ -134,10 +134,9 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     await message.channel.send({
       content,
       embeds,
-      components:
-        components.length > 0
-          ? [{ type: ComponentType.ActionRow, components }]
-          : [],
+      components: components.length > 0
+        ? [{ type: ComponentType.ActionRow, components }]
+        : [],
       allowedMentions: { parse: [] },
     });
   }
@@ -232,7 +231,7 @@ async function verbalizeCrash(
           info.fix
             .replaceAll("%pathindicator%", pathIndicator)
             .replaceAll("%gameroot%", gameRoot)
-            .replaceAll("%profileroot%", profileRoot),
+            .replaceAll("%profileroot%", profileRoot)
         ),
       ).join("\n"),
     };
