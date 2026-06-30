@@ -23,13 +23,13 @@
     "consola": "^3.4.2",
     "dedent": "^1.7.2",
     "discord.js": "^14.26.4",
-    "es-toolkit": "^1.47.0",
+    "es-toolkit": "^1.49.0",
     "expiry-map": "^2.0.0",
     "jszip": "^3.10.1",
     "lowdb": "^7.0.1",
     "p-map": "^7.0.4",
     "p-memoize": "^8.0.0",
-    "prettier": "^3.8.3",
+    "prettier": "^3.9.3",
     "zod": "^4.4.3"
   },
   "devDependencies": {
