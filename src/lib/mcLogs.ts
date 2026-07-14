@@ -7,7 +7,7 @@ const api = ky.create({
   baseUrl: "https://api.mclo.gs/1/",
 });
 
-export const limits = await api.post("limits").json(z.object({
+export const limits = await api.get("limits").json(z.object({
   storageTime: z.number(),
   maxLength: z.number(),
   maxLines: z.number(),
