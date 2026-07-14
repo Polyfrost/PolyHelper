@@ -3,9 +3,8 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { type Args, Command } from "@sapphire/framework";
 // import { Type } from "@sapphire/type";
 import { send } from "@sapphire/plugin-editable-commands";
-import { isThenable } from "@sapphire/utilities";
 import consola from "consola";
-import { codeBlock, inlineCode, type Message, subtext } from "discord.js";
+import { codeBlock, type Message } from "discord.js";
 
 @ApplyOptions<Command.Options>({
   aliases: ["ev"],
@@ -19,7 +18,7 @@ export class UserCommand extends Command {
   public override async messageRun(message: Message, args: Args) {
     const code = await args.rest("string");
 
-    const { result, success, type } = await this.eval(message, code, {
+    const { result, success } = await this.eval(message, code, {
       async: args.getFlags("async"),
       depth: Number(args.getOption("depth")) || 0,
       showHidden: args.getFlags("hidden", "showHidden"),
@@ -31,17 +30,14 @@ export class UserCommand extends Command {
       ? codeBlock("js", result)
       : `**ERROR**: ${codeBlock("bash", result)}`;
 
-    const typeFooter = subtext(inlineCode(type));
-
     if (output.length > 2000) {
       return send(message, {
-        content:
-          `Output was too long... sent the result as a file.\n${typeFooter}`,
+        content: `Output was too long... sent the result as a file.`,
         files: [{ attachment: Buffer.from(result), name: "output.js" }],
       });
     }
 
-    return send(message, `${output}\n${typeFooter}`);
+    return send(message, `${output}`);
   }
 
   private async eval(
@@ -58,32 +54,17 @@ export class UserCommand extends Command {
     let ret: unknown;
 
     try {
-      ret = eval(code);
+      ret = await eval(code);
     } catch (error) {
       if (error && error instanceof Error && error.stack) consola.error(error);
       ret = error;
       success = false;
     }
 
-    const type = getType(ret);
-    // eslint-disable-next-line @typescript-eslint/await-thenable
-    if (isThenable(ret)) ret = await ret;
-
     const result = inspect(ret, {
       depth: flags.depth,
       showHidden: flags.showHidden,
     });
-    return { result, success, type };
+    return { result, success };
   }
-}
-
-function getType(obj: unknown) {
-  if (obj === null) return "null";
-  if (obj === undefined) return "undefined";
-
-  const constructorName = obj.constructor?.name;
-  if (!constructorName) {
-    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
-  }
-  return constructorName;
 }
