@@ -11,7 +11,6 @@
     "npm:@sapphire/cli@^1.9.3": "1.9.3",
     "npm:@sapphire/decorators@^6.2.0": "6.2.0",
     "npm:@sapphire/discord.js-utilities@^7.3.3": "7.3.3",
-    "npm:@sapphire/fetch@^3.0.5": "3.0.5",
     "npm:@sapphire/framework@^5.5.0": "5.5.0",
     "npm:@sapphire/plugin-editable-commands@^4.0.4": "4.0.4",
     "npm:@sapphire/plugin-subcommands@^7.0.1": "7.0.1",
@@ -271,9 +270,6 @@
     },
     "@sapphire/duration@1.2.0": {
       "integrity": "sha512-LxjOAFXz81WmrI8XX9YaVcAZDjQj/1p78lZCvkAWZB1nphOwz/D0dU3CBejmhOWx5dO5CszTkLJMNR0xuCK+Zg=="
-    },
-    "@sapphire/fetch@3.0.5": {
-      "integrity": "sha512-YfH5iFFL+n21dEWfdNpSlN1Q4RH+84I9ZFLxtdlbqyWljkh1IwMU6UmHjnroiRJx9TwdFSQ0krHm4v0fV/VqiA=="
     },
     "@sapphire/framework@5.5.0": {
       "integrity": "sha512-jC+zS8yR/MtJaTFEQutBBWj7Scuvny4d0adtQ3s0OCFWe3rUqNfENomBG3P4tsQ/kRF7L3WCqucyLV8ywG24hw==",
@@ -727,7 +723,6 @@
         "npm:@sapphire/cli@^1.9.3",
         "npm:@sapphire/decorators@^6.2.0",
         "npm:@sapphire/discord.js-utilities@^7.3.3",
-        "npm:@sapphire/fetch@^3.0.5",
         "npm:@sapphire/framework@^5.5.0",
         "npm:@sapphire/plugin-editable-commands@^4.0.4",
         "npm:@sapphire/plugin-subcommands@^7.0.1",
