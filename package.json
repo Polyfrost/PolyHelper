@@ -8,7 +8,6 @@
     "@octokit/rest": "^22.0.1",
     "@sapphire/decorators": "^6.2.0",
     "@sapphire/discord.js-utilities": "^7.3.3",
-    "@sapphire/fetch": "^3.0.5",
     "@sapphire/framework": "^5.5.0",
     "@sapphire/plugin-editable-commands": "^4.0.4",
     "@sapphire/plugin-subcommands": "^7.0.1",

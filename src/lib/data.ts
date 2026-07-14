@@ -1,21 +1,14 @@
-import { fetch, FetchResultTypes } from "@sapphire/fetch";
 import { Time } from "@sapphire/time-utilities";
 import consola from "consola";
 import ExpiryMap from "expiry-map";
 import pMemoize, { pMemoizeClear } from "p-memoize";
 import { z } from "zod";
 import { getRepoCount } from "./GHAPI.ts";
+import ky from "ky";
 
 async function _getTrackedJSON(url: string): Promise<unknown> {
   consola.info("refetching", url);
-  try {
-    const resp = await fetch(url, FetchResultTypes.Result);
-    if (!resp.ok) throw new Error(`http error ${resp.statusText}`);
-    return resp.json();
-  } catch (e) {
-    consola.error(`error while fetching ${url}`, e);
-    throw new Error(`error while fetching ${url}`, { cause: e });
-  }
+  return await ky(url).json();
 }
 const getTrackedJSON = pMemoize(_getTrackedJSON, {
   cache: new ExpiryMap(Time.Hour),
