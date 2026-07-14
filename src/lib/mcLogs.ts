@@ -128,7 +128,7 @@ export async function postLog(
 ): Promise<APILog> {
   const res = await api.post(`log`, {
     json: {
-      content: content.substring(0, maxSize),
+      content: content.substring(0, limits.maxLength),
       ...opts,
     },
   }).json(LogResults);
