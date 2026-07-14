@@ -1,5 +1,4 @@
 import { ApplyOptions } from "@sapphire/decorators";
-import { fetch, FetchResultTypes } from "@sapphire/fetch";
 import { Events, Listener } from "@sapphire/framework";
 import { format as formatBytes } from "@std/fmt/bytes";
 import consola from "consola";
@@ -16,7 +15,8 @@ import {
 import { isNotNil, uniq } from "es-toolkit";
 import { z } from "zod";
 import { getJSON } from "../../lib/data.ts";
-import { Log, maxSize, postLog } from "../../lib/mcLogs.ts";
+import { getLog, limits, postLog, PostLogMetadata } from "../../lib/mcLogs.ts";
+import ky from "ky";
 
 const mclogsLogo = "https://mclo.gs/img/logo.png";
 const mclogsRegex = /https:\/\/(?:mclo\.gs|api.mclo\.gs\/1\/raw)\/([a-z0-9]+)/i;
@@ -30,7 +30,10 @@ const hstshRegexG = new RegExp(hstshRegex, "gi");
 })
 export class UserEvent extends Listener<typeof Events.MessageCreate> {
   public override async run(message: Message<true>) {
+    // Don't parse logs on @silent
+    if (message.flags.has("SuppressNotifications")) return;
     if (message.content.toLowerCase().includes("sky ignore")) return;
+    if (message.content.toLowerCase().includes("poly ignore")) return;
 
     const msgLogs = message.attachments
       .filter(
@@ -53,21 +56,25 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     let text: string;
     let content = `${message.author.toString()} uploaded a `;
     try {
-      const mcLog = await getNewLog(logURL);
+      const mcLog = await getNewLog(logURL, [
+        { key: "uploader", value: message.author.tag, label: "Uploader" },
+        { key: "uploader_id", value: message.author.id, visible: false },
+      ]);
       try {
         await message.delete();
       } catch (e) {
         // message may have already been deleted by another bot
         consola.error("Failed to delete log message", e);
       }
-      text = await mcLog.getRaw();
-      const insights = await mcLog.getInsights();
+      text = mcLog.content.raw;
+      const insights = mcLog.content.insights;
       content += insights.type;
 
-      const logSize = text.length;
+      const logSize = mcLog.size;
       const logFileSize = formatBytes(logSize, { binary: true });
-      const logLines = text.split("\n").length;
-      const truncated = logLines == 25_000 || logSize == maxSize;
+      const logLines = mcLog.lines;
+      const truncated = logLines == limits.maxLines ||
+        logSize == limits.maxLength;
       let footer = `${logFileSize} / ${logLines} lines`;
       if (truncated) footer += " (truncated)";
       embeds.push({
@@ -114,7 +121,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
         description: e instanceof Error ? e.message : "Unknown error",
         thumbnail: { url: mclogsLogo },
       });
-      text = await fetch(logURL, FetchResultTypes.Text);
+      text = await ky(logURL).text();
       content += "file";
     }
 
@@ -143,11 +150,23 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
 
 // We want to use mclo.gs to censor logs,
 // but we don't need to upload if the log is already from MCLogs.
-async function getNewLog(url: string): Promise<Log> {
-  if (url.includes("mclo.gs")) return new Log(url);
+async function getNewLog(
+  url: string,
+  metadata?: PostLogMetadata[],
+) {
+  let log: string | { id: string } = url;
+  if (!url.includes("mclo.gs")) {
+    const text = await ky(url).text();
+    log = await postLog(text, {
+      source: "PolyHelper",
+      metadata,
+    });
+  }
 
-  const text = await fetch(url, FetchResultTypes.Text);
-  return await postLog(text);
+  return await getLog(log, {
+    raw: true,
+    insights: true,
+  });
 }
 
 function findLogs(txt: string) {

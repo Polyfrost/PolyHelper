@@ -1,11 +1,17 @@
-import { fetch, FetchResultTypes } from "@sapphire/fetch";
 import { Time } from "@sapphire/time-utilities";
 import ExpiryMap from "expiry-map";
-import pMemoize from "p-memoize";
 import { z } from "zod";
+import ky from "ky";
 
-const baseURL = "https://api.mclo.gs/1";
-export const maxSize = 10_485_760;
+const api = ky.create({
+  baseUrl: "https://api.mclo.gs/1/",
+});
+
+export const limits = await api.post("limits").json(z.object({
+  storageTime: z.number(),
+  maxLength: z.number(),
+  maxLines: z.number(),
+}));
 
 const APIError = z.object({
   success: z.literal(false),
@@ -13,65 +19,21 @@ const APIError = z.object({
 });
 type APIError = z.infer<typeof APIError>;
 
-const PostLog = z.object({
-  success: z.literal(true),
-  id: z.string(),
+export const PostLogMetadata = z.object({
+  key: z.string(),
+  value: z.union([
+    z.string(),
+    z.number(),
+    z.boolean(),
+    z.null(),
+  ]),
+  label: z.string().nullable().default(null),
+  visible: z.boolean().default(false),
 });
-type PostLog = z.infer<typeof PostLog>;
+export type PostLogMetadata = z.input<typeof PostLogMetadata>;
 
-const PostLogRes = z.discriminatedUnion("success", [PostLog, APIError]);
-type PostLogRes = z.infer<typeof PostLogRes>;
-
-type LogType = { id: string };
-
-export class Log {
-  readonly id: string;
-  constructor(id: string | LogType) {
-    this.id = getMCLogID(id);
-  }
-
-  get url() {
-    return `https://mclo.gs/${this.id}`;
-  }
-
-  get raw() {
-    return `${baseURL}/raw/${this.id}`;
-  }
-
-  getRaw() {
-    return getRawLog(this.id);
-  }
-  getInsights() {
-    return getLogInsights(this.id);
-  }
-}
-
-export async function postLog(text: string): Promise<Log> {
-  const params = new URLSearchParams({ content: text.substring(0, maxSize) });
-  const data = await fetch(`${baseURL}/log`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: params.toString(),
-  });
-  const res = PostLogRes.parse(data);
-  if (!res.success) throw new Error(res.error);
-  return new Log(res);
-}
-
-const getMCLogID = (log: string | LogType) =>
-  encodeURIComponent(
-    typeof log == "string" ? log.split("/").pop() || "" : log.id,
-  );
-
-async function _getRawLog(log: string | LogType): Promise<string> {
-  const id = getMCLogID(log);
-  return await fetch(`${baseURL}/raw/${id}`, FetchResultTypes.Text);
-}
-export const getRawLog = pMemoize(_getRawLog, {
-  cacheKey: ([log]) => getMCLogID(log),
-  cache: new ExpiryMap(Time.Hour),
-});
-
+// https://github.com/aternosorg/codex/blob/master/src/Log/Level.php
+// https://github.com/aternosorg/codex-minecraft/blob/master/src/Parser/ReportLevel.php
 enum Level {
   EMERGENCY,
   ALERT,
@@ -81,6 +43,9 @@ enum Level {
   NOTICE,
   INFO,
   DEBUG,
+  TITLE,
+  COMMENT,
+  STACKTRACE,
 }
 
 const EntryLevel = z.enum(Level);
@@ -89,12 +54,13 @@ const EntryLine = z.object({
   number: z.number(),
   content: z.string(),
 });
-const AnalysisEntry = z.object({
+const ParsedEntry = z.object({
   level: EntryLevel,
   time: z.null(),
-  prefix: z.string(),
+  prefix: z.string().nullable(),
   lines: z.array(EntryLine),
 });
+type ParsedEntry = z.infer<typeof ParsedEntry>;
 
 const LogInsights = z.object({
   id: z.string(),
@@ -107,7 +73,7 @@ const LogInsights = z.object({
       z.object({
         message: z.string(),
         counter: z.number(),
-        entry: AnalysisEntry,
+        entry: ParsedEntry,
         solutions: z.array(z.object({ message: z.string() })),
       }),
     ),
@@ -117,19 +83,124 @@ const LogInsights = z.object({
         counter: z.number(),
         label: z.string(),
         value: z.string(),
-        entry: AnalysisEntry,
+        entry: ParsedEntry,
       }),
     ),
   }),
 });
 type LogInsights = z.infer<typeof LogInsights>;
 
-async function _getLogInsights(log: string | LogType) {
-  const id = getMCLogID(log);
-  const data = await fetch(`${baseURL}/insights/${id}`);
-  return LogInsights.parse(data);
-}
-export const getLogInsights = pMemoize(_getLogInsights, {
-  cacheKey: ([log]) => getMCLogID(log),
-  cache: new ExpiryMap(Time.Hour),
+export const APILog = z.object({
+  success: z.literal(true),
+  id: z.string(),
+  source: z.string().nullable(),
+  created: z.number(),
+  expires: z.number(),
+  size: z.number(),
+  lines: z.number(),
+  errors: z.number(),
+  url: z.string(),
+  raw: z.string(),
+  token: z.string().optional(),
+  metadata: z.array(PostLogMetadata),
+  content: z.object({
+    insights: LogInsights.optional(),
+    raw: z.string().optional(),
+    parsed: z.array(ParsedEntry).optional(),
+  }).default({}),
 });
+export type APILog = z.infer<typeof APILog>;
+
+const LogResults = z.discriminatedUnion("success", [APILog, APIError]);
+type LogResults = z.infer<typeof LogResults>;
+
+export type LogType = { id: string };
+
+const logCache = new ExpiryMap<string, APILog>(Time.Hour);
+
+export interface PostLogOptions {
+  source?: string;
+  metadata?: PostLogMetadata[];
+}
+export async function postLog(
+  content: string,
+  opts: PostLogOptions = {},
+): Promise<APILog> {
+  const res = await api.post(`log`, {
+    json: {
+      content: content.substring(0, maxSize),
+      ...opts,
+    },
+  }).json(LogResults);
+  if (!res.success) throw new Error(res.error);
+
+  logCache.set(res.id, res);
+  return res;
+}
+
+const getMCLogID = (log: string | LogType) =>
+  encodeURIComponent(
+    typeof log == "string" ? log.split("/").pop() || "" : log.id,
+  );
+
+type GetLogResult<
+  R extends boolean,
+  P extends boolean,
+  I extends boolean,
+> = APILog & {
+  content: {
+    insights: I extends true ? LogInsights : LogInsights | undefined;
+    raw: R extends true ? string : string | undefined;
+    parsed: P extends true ? ParsedEntry[] : ParsedEntry[] | undefined;
+  };
+};
+
+export async function getLog<
+  R extends boolean = false,
+  P extends boolean = false,
+  I extends boolean = false,
+>(
+  logID: string | LogType,
+  opts: {
+    raw?: R;
+    parsed?: P;
+    insights?: I;
+  } = {},
+): Promise<GetLogResult<R, P, I>> {
+  const id = getMCLogID(logID);
+  let cached = logCache.get(id);
+  if (cached) {
+    if (
+      (!opts.raw || cached.content.raw) &&
+      (!opts.parsed || cached.content.parsed) &&
+      (!opts.insights || cached.content.insights)
+    ) {
+      return cached as GetLogResult<R, P, I>;
+    }
+  }
+
+  const res = await api.get(`log/${id}`, {
+    searchParams: opts as Record<string, boolean>,
+  }).json(LogResults);
+  if (!res.success) throw new Error(res.error);
+
+  // In case of race condition
+  cached = logCache.get(id);
+  if (cached) {
+    res.token ||= cached.token;
+    res.content.raw ||= cached.content.raw;
+    res.content.insights ||= cached.content.insights;
+    res.content.parsed ||= cached.content.parsed;
+  }
+
+  logCache.set(id, res);
+  return res as GetLogResult<R, P, I>;
+}
+
+export async function getRawLog(logID: string | LogType): Promise<string> {
+  return (await getLog(logID, { raw: true })).content.raw;
+}
+
+export async function getLogInsights(logID: string | LogType) {
+  return (await getLog(logID, { raw: true })).content.insights;
+}
