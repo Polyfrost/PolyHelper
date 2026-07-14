@@ -15,7 +15,6 @@ import {
 } from "discord.js";
 import { isNotNil, uniq } from "es-toolkit";
 import { z } from "zod";
-import { SkyClient } from "../../const.ts";
 import { getJSON } from "../../lib/data.ts";
 import { Log, maxSize, postLog } from "../../lib/mcLogs.ts";
 
@@ -119,7 +118,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
       content += "file";
     }
 
-    const verb = await verbalizeCrash(text, message.guildId == SkyClient.id);
+    const verb = await verbalizeCrash(text);
     if (verb.length > 0) {
       const myAvatar = message.client.user.avatarURL();
       embeds.push({
@@ -170,7 +169,6 @@ const CrashCause = z.object({
 const CrashFix = z.object({
   name: z.string().optional(),
   fixtype: z.number().optional(),
-  onlySkyClient: z.boolean().optional(),
   fix: z.string(),
   causes: z.array(CrashCause),
 });
@@ -189,11 +187,10 @@ export const getCrashes = async () =>
 
 async function verbalizeCrash(
   log: string,
-  isSkyClient: boolean,
 ): Promise<APIEmbedField[]> {
   const pathIndicator = "`";
   const gameRoot = ".minecraft";
-  const profileRoot = isSkyClient ? ".minecraft/skyclient" : ".minecraft";
+  const profileRoot = ".minecraft";
   let crashData: Crashes;
   try {
     crashData = await getCrashes();
@@ -207,7 +204,6 @@ async function verbalizeCrash(
     ];
   }
   const relevantInfo = crashData.fixes.filter((fix) => {
-    if (fix.onlySkyClient && !isSkyClient) return false;
     return fix.causes.every((type) => {
       if (type.method == "contains") return log.includes(type.value);
       else if (type.method == "regex") return log.match(new RegExp(type.value));

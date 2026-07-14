@@ -11,7 +11,7 @@ import {
   Message,
   unorderedList,
 } from "discord.js";
-import { Polyfrost, SkyClient } from "../../const.ts";
+import { Polyfrost } from "../../const.ts";
 import { isTicket } from "../../lib/ticket.ts";
 
 const streaks: Record<string, string[]> = {};
@@ -21,11 +21,6 @@ const ignoredChannels = [
   "1057847561597239336", // #counting
   "1524935257046908948", // #meowing
   Polyfrost.channels.TestingChat,
-
-  // SkyClient
-  SkyClient.channels.BotCommands,
-  "1135190905373081650", // #the-void
-  SkyClient.channels.Trolling,
 ];
 
 /** Flags users who are spamming for giveaways */
@@ -39,24 +34,14 @@ export class MessageListener extends Listener<typeof Events.MessageCreate> {
     const member = guild.members.cache.get(author.id);
     if (!member) return;
 
-    const isSkyClient = guild.id == SkyClient.id;
-    const isPolyfrost = guild.id == Polyfrost.id;
-
-    if (!isSkyClient && !isPolyfrost) return;
+    if (guild.id != Polyfrost.id) return;
     if (!isGuildBasedChannel(channel)) return;
     if (isTicket(channel)) return;
 
-    const noGiveawaysRole = isSkyClient
-      ? SkyClient.roles.NoGiveaways
-      : Polyfrost.roles.NoGiveaways;
-    const botLogsChannel = isSkyClient
-      ? SkyClient.channels.BotLogs
-      : Polyfrost.channels.BotLogs;
+    const noGiveawaysRole = Polyfrost.roles.NoGiveaways;
     const roles = member.roles.cache;
 
     if (ignoredChannels.includes(channel.id)) return;
-    if (roles.has(SkyClient.roles.CoolPeople)) return;
-    if (roles.has(SkyClient.roles.GiveawayBypass)) return;
     if (roles.has(noGiveawaysRole)) return; // already has no giveaways
 
     let streak = streaks[author.id];
@@ -96,7 +81,7 @@ export class MessageListener extends Listener<typeof Events.MessageCreate> {
         allowedMentions: { users: [member.id] },
       });
 
-      const botLogs = client.channels.cache.get(botLogsChannel);
+      const botLogs = client.channels.cache.get(Polyfrost.channels.BotLogs);
       if (!isTextChannel(botLogs)) return;
 
       embed.addFields({

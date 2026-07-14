@@ -8,7 +8,7 @@ import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
 import consola from "consola";
 import { Message, roleMention, TextChannel } from "discord.js";
 import pMemoize from "p-memoize";
-import { DevServer, Polyfrost, SkyClient, SupportTeams } from "../const.ts";
+import { DevServer, Polyfrost, SupportTeams } from "../const.ts";
 import { formatChannel } from "./logHelper.ts";
 
 export async function setTicketOpen(
@@ -87,7 +87,6 @@ export function isSupportTeam(member: FirstArgument<typeof isGuildMember>) {
     member.permissions.has("Administrator") ||
     member.permissions.has("ManageMessages") ||
     member.roles.cache.hasAny(
-      SkyClient.roles.SupportTeam,
       Polyfrost.roles.SupportTeam,
       Polyfrost.roles.ModTeam,
       Polyfrost.roles.PolyTeam,

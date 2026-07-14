@@ -5,7 +5,7 @@ import {
 } from "@sapphire/framework";
 import consola from "consola";
 import { type ButtonInteraction, MessageFlags } from "discord.js";
-import { Polyfrost, SkyClient } from "../const.ts";
+import { Polyfrost } from "../const.ts";
 
 @ApplyOptions<InteractionHandler.Options>({
   interactionHandlerType: InteractionHandlerTypes.Button,
@@ -18,10 +18,7 @@ export class ButtonHandler extends InteractionHandler {
       if (
         respondedTo == interaction.member.id ||
         interaction.member.permissions.has("ManageMessages") ||
-        interaction.member.roles.cache.hasAny(
-          SkyClient.roles.SupportTeam,
-          Polyfrost.roles.SupportTeam,
-        )
+        interaction.member.roles.cache.has(Polyfrost.roles.SupportTeam)
       ) {
         return await interaction.message.delete();
       } else {

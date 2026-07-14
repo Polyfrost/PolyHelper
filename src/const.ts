@@ -1,37 +1,9 @@
 import { formatEmoji } from "discord.js";
+import { mapValues } from "es-toolkit/object";
 
-const DevUser = "ethan";
-const user = process.env["USER"] || process.env["USERNAME"];
-export const isDevUser = user == DevUser;
-export const repoFilesURL =
-  "https://github.com/SkyblockClient/SkyblockClient-REPO/raw/main/files";
 export const shrug = "¯\\_(ツ)_/¯";
 export const repoURL = "https://github.com/Polyfrost/PolyHelper";
-export const assetsBase = `${repoURL}/raw/rewrite/assets`;
-
-export const SkyClient = {
-  id: "780181693100982273",
-  channels: {
-    General: "780181693553704973",
-    SkyblockTalk: "1110717104757416027",
-    Trolling: "887818760126345246",
-    BotCommands: "796546551878516766",
-    BotLogs: "934968221923168266",
-    Tickets: "1222344626325688330",
-    ModUpdating: "1198710827327434852",
-    Support: "931624995522773032",
-  },
-  roles: {
-    CoolPeople: "832754819588292679",
-    NoGiveaways: "832325812329906176",
-    GitHubKeeper: "799020944487612428",
-    NoAuto: "852016624605462589",
-    GiveawayBypass: "1187979851706142793",
-    GiveawayDonor: "1186726399789248693",
-    SupportTeam: "931626562539909130",
-    ModTeam: "796896475719401524",
-  },
-};
+export const assetsBase = `${repoURL}/raw/main/assets`;
 
 export const Polyfrost = {
   id: "822066990423605249",
@@ -56,40 +28,34 @@ export const Polyfrost = {
     ModTeam: "822070886223052841",
     PolyTeam: "982578079673245726",
   },
-};
+} as const;
 
 export const DevServer = {
   id: "959660149344198706",
   roles: {
     SupportTeam: "1240761899092803715",
   },
-};
+} as const;
 
 export const Users = {
   TicketTool: "557628352828014614",
   Fire: "444871677176709141",
   BotDev: "157917665162297344",
   nacrt: "435443705055543306",
-};
+} as const;
 
-export const EmojiIDs = {
-  Windows: "1369004272880189611",
-  Java: "1369004299182407853",
-  Chrome: "1369004226000322600",
-  YouWhat: "889306727953104936",
-  BlameWyvest: "1001055682289741864",
-};
+export const EmojiIDs = {} as const;
 
 // Animated Emojis
-export const AEmojiIDs: Record<string, string> = {};
+export const AEmojiIDs = {} as const;
 
-const emojiMap = Object.fromEntries(
-  Object.entries(EmojiIDs).map(([k, v]) => [k, formatEmoji(v)]),
-) as Record<keyof typeof EmojiIDs, `<:emoji:${string}>`>;
+const emojiMap = mapValues(EmojiIDs, (v) => formatEmoji(v)) as {
+  -readonly [K in keyof typeof EmojiIDs]: `<:emoji:${typeof EmojiIDs[K]}>`;
+};
 
-const aEmojiMap = Object.fromEntries(
-  Object.entries(AEmojiIDs).map(([k, v]) => [k, formatEmoji(v, true)]),
-) as Record<keyof typeof AEmojiIDs, `<a:emoji:${string}>`>;
+const aEmojiMap = mapValues(AEmojiIDs, (v) => formatEmoji(v, true)) as {
+  -readonly [K in keyof typeof AEmojiIDs]: `<a:emoji:${typeof AEmojiIDs[K]}>`;
+};
 
 export const Emojis = {
   ...emojiMap,
@@ -102,10 +68,9 @@ export const Emojis = {
   Eyes: "👀",
   Check: "✅",
   Cross: "❌",
-};
+} as const;
 
-export const SupportTeams: Record<string, string> = {
-  [SkyClient.id]: SkyClient.roles.SupportTeam,
+export const SupportTeams: Readonly<Record<string, string>> = {
   [Polyfrost.id]: Polyfrost.roles.SupportTeam,
   [DevServer.id]: DevServer.roles.SupportTeam,
 };

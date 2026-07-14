@@ -13,9 +13,7 @@ import {
 } from "discord.js";
 import { z } from "zod";
 import { Emojis } from "../const.ts";
-import { getDiscords, getMods, getPacks } from "../lib/data.ts";
 import { getTicketOwner, getTicketTop, isTicket } from "../lib/ticket.ts";
-import { getUpdatePerms } from "../lib/update.ts";
 import { getCrashes } from "../listeners/resps/handleLogs.ts";
 
 @ApplyOptions<Subcommand.Options>({
@@ -79,35 +77,6 @@ export class UserCommand extends Subcommand {
     await interaction.deferReply();
     const components = [];
 
-    const baseURL =
-      "https://github.com/SkyblockClient/SkyblockClient-REPO/blob/main/files";
-    components.push(
-      await tryParse(
-        hyperlink("mods.json", hideLinkEmbed(`${baseURL}/mods.json`)),
-        getMods,
-      ),
-    );
-    components.push(
-      await tryParse(
-        hyperlink("packs.json", hideLinkEmbed(`${baseURL}/packs.json`)),
-        getPacks,
-      ),
-    );
-    components.push(
-      await tryParse(
-        hyperlink("discords.json", hideLinkEmbed(`${baseURL}/discords.json`)),
-        getDiscords,
-      ),
-    );
-    components.push(
-      await tryParse(
-        hyperlink(
-          "update_perms.json",
-          hideLinkEmbed(`${baseURL}/update_perms.json`),
-        ),
-        getUpdatePerms,
-      ),
-    );
     components.push(
       await tryParse(
         hyperlink(

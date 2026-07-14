@@ -7,7 +7,7 @@ import {
   EmbedBuilder,
   MessageFlags,
 } from "discord.js";
-import { Polyfrost, SkyClient } from "../const.ts";
+import { Polyfrost } from "../const.ts";
 
 @ApplyOptions<Command.Options>({
   description: "Block a user from giveaways",
@@ -45,29 +45,15 @@ export class UserCommand extends Command {
   ) {
     const member = interaction.options.getMember("user");
     if (!isGuildMember(member)) return;
+    if (interaction.guildId != Polyfrost.id) return;
 
-    const isSkyClient = interaction.guildId == SkyClient.id;
-    const isPolyfrost = interaction.guildId == Polyfrost.id;
-    if (!isSkyClient && !isPolyfrost) return;
-
-    const noGiveawaysRole = isSkyClient
-      ? SkyClient.roles.NoGiveaways
-      : Polyfrost.roles.NoGiveaways;
-    const botLogsChannel = isSkyClient
-      ? SkyClient.channels.BotLogs
-      : Polyfrost.channels.BotLogs;
+    const noGiveawaysRole = Polyfrost.roles.NoGiveaways;
     const roles = member.roles.cache;
 
     if (roles.has(noGiveawaysRole)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "User is already blocked from giveaways",
-      });
-    }
-    if (roles.has(SkyClient.roles.CoolPeople)) {
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: "User is too cool 😎",
       });
     }
 
@@ -96,7 +82,9 @@ export class UserCommand extends Command {
         allowedMentions: { users: [member.id] },
       });
 
-      const botLogs = interaction.client.channels.cache.get(botLogsChannel);
+      const botLogs = interaction.client.channels.cache.get(
+        Polyfrost.channels.BotLogs,
+      );
       if (!isTextChannel(botLogs)) return;
 
       embed.setAuthor({
