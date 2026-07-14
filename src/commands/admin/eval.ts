@@ -3,9 +3,9 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { type Args, Command } from "@sapphire/framework";
 // import { Type } from "@sapphire/type";
 import { send } from "@sapphire/plugin-editable-commands";
-import { codeBlock, isThenable } from "@sapphire/utilities";
+import { isThenable } from "@sapphire/utilities";
 import consola from "consola";
-import type { Message } from "discord.js";
+import { codeBlock, inlineCode, type Message, subtext } from "discord.js";
 
 @ApplyOptions<Command.Options>({
   aliases: ["ev"],
@@ -31,7 +31,7 @@ export class UserCommand extends Command {
       ? codeBlock("js", result)
       : `**ERROR**: ${codeBlock("bash", result)}`;
 
-    const typeFooter = `**Type**: ${codeBlock("typescript", type)}`;
+    const typeFooter = subtext(inlineCode(type));
 
     if (output.length > 2000) {
       return send(message, {
@@ -65,7 +65,7 @@ export class UserCommand extends Command {
       success = false;
     }
 
-    const type = "unknown"; // new Type(ret).toString();
+    const type = getType(ret);
     // eslint-disable-next-line @typescript-eslint/await-thenable
     if (isThenable(ret)) ret = await ret;
 
@@ -75,4 +75,15 @@ export class UserCommand extends Command {
     });
     return { result, success, type };
   }
+}
+
+function getType(obj: unknown) {
+  if (obj === null) return "null";
+  if (obj === undefined) return "undefined";
+
+  const constructorName = obj.constructor?.name;
+  if (!constructorName) {
+    return Object.prototype.toString.call(obj).slice(8, -1).toLowerCase();
+  }
+  return constructorName;
 }
