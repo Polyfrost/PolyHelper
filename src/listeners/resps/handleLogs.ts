@@ -54,7 +54,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     const embeds: APIEmbed[] = [];
     const components: MessageActionRowComponentData[] = [];
     let text: string;
-    let content = `${message.author.toString()} uploaded a `;
+    let fileType = "file";
     try {
       const mcLog = await getNewLog(logURL, [
         { key: "uploader", value: message.author.tag, label: "Uploader" },
@@ -68,15 +68,14 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
       }
       text = mcLog.content.raw;
       const insights = mcLog.content.insights;
-      content += insights.type;
+      fileType = insights.type;
 
-      const logSize = mcLog.size;
-      const logFileSize = formatBytes(logSize, { binary: true });
-      const logLines = mcLog.lines;
-      const truncated = logLines == limits.maxLines ||
-        logSize == limits.maxLength;
-      let footer = `${logFileSize} / ${logLines} lines`;
-      if (truncated) footer += " (truncated)";
+      const logSize = formatBytes(mcLog.size, { binary: true });
+      let footer = `${logSize} / ${mcLog.lines} lines`;
+      if (
+        mcLog.lines == limits.maxLines ||
+        mcLog.size == limits.maxLength
+      ) footer += " (truncated)";
       embeds.push({
         title: insights.title,
         url: mcLog.url,
@@ -113,7 +112,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
         thumbnail: { url: mclogsLogo },
       });
       text = await ky(logURL).text();
-      content += "file";
+      fileType = "file";
     }
 
     const verb = await verbalizeCrash(text);
@@ -127,6 +126,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
       });
     }
 
+    let content = `${message.author.toString()} uploaded a ${fileType}`;
     if (newContent) content += `\n${blockQuote(newContent)}`;
     await message.channel.send({
       content,
