@@ -95,7 +95,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
           title: "This may be an incomplete log",
           color: Colors.Yellow,
           description:
-            "If you're using Prism or Modrinth Launcher, please upload fml-client-latest.",
+            "If you're using Prism or Modrinth Launcher, please upload the log file called `latest` or `fml-client-latest`.",
         });
       }
 
