@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import { Polyfrost } from "../../const.ts";
 import { isTicket } from "../../lib/ticket.ts";
+import { GiveawayMonitorDB } from "../../lib/db.ts";
 
 const streaks: Record<string, string[]> = {};
 const ignoredChannels = [
@@ -33,6 +34,9 @@ export class MessageListener extends Listener<typeof Events.MessageCreate> {
     if (author.bot || !guild) return;
     const member = guild.members.cache.get(author.id);
     if (!member) return;
+
+    const db = GiveawayMonitorDB.data;
+    if (!db.enabled) return;
 
     if (guild.id != Polyfrost.id) return;
     if (!isGuildBasedChannel(channel)) return;

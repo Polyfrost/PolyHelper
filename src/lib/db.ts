@@ -17,3 +17,9 @@ export const BoostersDB = await JSONFilePreset<BoostersDB>(
   join(baseDir, "boosters.json"),
   {},
 );
+
+type GiveawayMonitorDB = { enabled: boolean };
+export const GiveawayMonitorDB = await JSONFilePreset<GiveawayMonitorDB>(
+  join(baseDir, "giveaway_monitor.json"),
+  { enabled: true },
+);
