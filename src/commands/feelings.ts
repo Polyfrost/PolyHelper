@@ -37,9 +37,10 @@ export class UserCommand extends Command {
     interaction: Command.ChatInputCommandInteraction,
   ) {
     const mention = interaction.options.getUser("mention", false);
-    const mentionText = isSupportTeam(interaction.member) && mention
-      ? `${mention.toString()} `
-      : "";
+    const mentionText =
+      isSupportTeam(interaction.member) && mention
+        ? `${mention.toString()} `
+        : "";
 
     let reply = dedent`
       I may be a bot, but that doesn't mean I don't have feelings.

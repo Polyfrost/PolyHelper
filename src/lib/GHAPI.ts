@@ -7,16 +7,14 @@ export const octokitAnon = new Octokit();
 
 async function _getRepoCount() {
   let count = 0;
-  for await (
-    const { data: page } of octokitAnon.paginate.iterator(
-      octokitAnon.rest.repos.listForOrg,
-      {
-        org: "Polyfrost",
-        type: "public",
-        per_page: 100,
-      },
-    )
-  ) {
+  for await (const { data: page } of octokitAnon.paginate.iterator(
+    octokitAnon.rest.repos.listForOrg,
+    {
+      org: "Polyfrost",
+      type: "public",
+      per_page: 100,
+    },
+  )) {
     count += page.length;
   }
   return count;

@@ -37,16 +37,16 @@ export class UserCommand extends Subcommand {
               option
                 .setName("channel")
                 .setDescription("Ticket channel")
-                .addChannelTypes(ChannelType.GuildText)
-            )
+                .addChannelTypes(ChannelType.GuildText),
+            ),
         )
         .addSubcommand((command) =>
           command
             .setName("json")
             .setDescription(
               "Parse all tracked JSONs and print any errors (DEBUG)",
-            )
-        )
+            ),
+        ),
     );
   }
 
@@ -55,9 +55,10 @@ export class UserCommand extends Subcommand {
   ) {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
-    const channel = interaction.options.getChannel("channel", false, [
-      ChannelType.GuildText,
-    ]) || interaction.channel;
+    const channel =
+      interaction.options.getChannel("channel", false, [
+        ChannelType.GuildText,
+      ]) || interaction.channel;
 
     if (!isTicket(channel)) return interaction.editReply("not a ticket");
 

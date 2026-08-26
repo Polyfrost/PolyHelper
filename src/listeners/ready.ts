@@ -15,11 +15,9 @@ export class UserEvent extends Listener {
     for (const store of stores) {
       consola.success(
         gray(
-          `Loaded ${
-            style(
-              store.size.toString().padEnd(3, " "),
-            )
-          } ${store.name}.`,
+          `Loaded ${style(
+            store.size.toString().padEnd(3, " "),
+          )} ${store.name}.`,
         ),
       );
     }

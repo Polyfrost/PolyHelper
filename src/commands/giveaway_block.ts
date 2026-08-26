@@ -60,8 +60,8 @@ export class UserCommand extends Command {
     try {
       await member.roles.add(noGiveawaysRole);
 
-      const reason = interaction.options.getString("reason") ||
-        "No reason provided";
+      const reason =
+        interaction.options.getString("reason") || "No reason provided";
 
       const embed = new EmbedBuilder()
         .setColor("Red")

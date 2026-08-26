@@ -72,10 +72,8 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
 
       const logSize = formatBytes(mcLog.size, { binary: true });
       let footer = `${logSize} / ${mcLog.lines} lines`;
-      if (
-        mcLog.lines == limits.maxLines ||
-        mcLog.size == limits.maxLength
-      ) footer += " (truncated)";
+      if (mcLog.lines == limits.maxLines || mcLog.size == limits.maxLength)
+        footer += " (truncated)";
       embeds.push({
         title: insights.title,
         url: mcLog.url,
@@ -131,9 +129,10 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
     await message.channel.send({
       content,
       embeds,
-      components: components.length > 0
-        ? [{ type: ComponentType.ActionRow, components }]
-        : [],
+      components:
+        components.length > 0
+          ? [{ type: ComponentType.ActionRow, components }]
+          : [],
       allowedMentions: { parse: [] },
     });
   }
@@ -141,10 +140,7 @@ export class UserEvent extends Listener<typeof Events.MessageCreate> {
 
 // We want to use mclo.gs to censor logs,
 // but we don't need to upload if the log is already from MCLogs.
-async function getNewLog(
-  url: string,
-  metadata?: PostLogMetadata[],
-) {
+async function getNewLog(url: string, metadata?: PostLogMetadata[]) {
   let log: string | { id: string } = url;
   if (!url.includes("mclo.gs")) {
     const text = await ky(url).text();
@@ -195,9 +191,7 @@ type Crashes = z.infer<typeof Crashes>;
 export const getCrashes = async () =>
   await getJSON("Polyfrost/CrashData", "main", "crashes.json", Crashes);
 
-async function verbalizeCrash(
-  log: string,
-): Promise<APIEmbedField[]> {
+async function verbalizeCrash(log: string): Promise<APIEmbedField[]> {
   const pathIndicator = "`";
   const gameRoot = ".minecraft";
   const profileRoot = ".minecraft";
@@ -237,7 +231,7 @@ async function verbalizeCrash(
           info.fix
             .replaceAll("%pathindicator%", pathIndicator)
             .replaceAll("%gameroot%", gameRoot)
-            .replaceAll("%profileroot%", profileRoot)
+            .replaceAll("%profileroot%", profileRoot),
         ),
       ).join("\n"),
     };

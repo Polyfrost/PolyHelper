@@ -67,14 +67,12 @@ export class UserCommand extends Command {
             },
             {
               name: "> No, all my problems are solved.",
-              value:
-                `__Close the ticket.__ View the ${pinnedMsg}, click the 🔒 button, and follow the bot's instructions.`,
+              value: `__Close the ticket.__ View the ${pinnedMsg}, click the 🔒 button, and follow the bot's instructions.`,
             },
           ],
         },
         {
-          description:
-            `If you do not respond ${twoDaysStamp}, your ticket will be closed.`,
+          description: `If you do not respond ${twoDaysStamp}, your ticket will be closed.`,
           color: Colors.DarkRed,
         },
       ],

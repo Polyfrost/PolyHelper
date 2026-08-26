@@ -60,7 +60,7 @@ export class UserCommand extends Command {
         messages
           .filter((message) => message.author.id === interaction.client.user.id)
           .filter((message) => message.content === PINNED_TICKET_MESSAGE)
-          .forEach((message) => message.unpin())
+          .forEach((message) => message.unpin()),
       );
 
     return interaction.reply("Ticket has been unpinned");

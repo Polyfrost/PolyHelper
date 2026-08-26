@@ -7,11 +7,13 @@ const api = ky.create({
   baseUrl: "https://api.mclo.gs/1/",
 });
 
-export const limits = await api.get("limits").json(z.object({
-  storageTime: z.number(),
-  maxLength: z.number(),
-  maxLines: z.number(),
-}));
+export const limits = await api.get("limits").json(
+  z.object({
+    storageTime: z.number(),
+    maxLength: z.number(),
+    maxLines: z.number(),
+  }),
+);
 
 const APIError = z.object({
   success: z.literal(false),
@@ -21,12 +23,7 @@ type APIError = z.infer<typeof APIError>;
 
 export const PostLogMetadata = z.object({
   key: z.string(),
-  value: z.union([
-    z.string(),
-    z.number(),
-    z.boolean(),
-    z.null(),
-  ]),
+  value: z.union([z.string(), z.number(), z.boolean(), z.null()]),
   label: z.string().nullable().default(null),
   visible: z.boolean().default(false),
 });
@@ -103,11 +100,13 @@ export const APILog = z.object({
   raw: z.string(),
   token: z.string().optional(),
   metadata: z.array(PostLogMetadata),
-  content: z.object({
-    insights: LogInsights.optional(),
-    raw: z.string().optional(),
-    parsed: z.array(ParsedEntry).optional(),
-  }).default({}),
+  content: z
+    .object({
+      insights: LogInsights.optional(),
+      raw: z.string().optional(),
+      parsed: z.array(ParsedEntry).optional(),
+    })
+    .default({}),
 });
 export type APILog = z.infer<typeof APILog>;
 
@@ -126,12 +125,14 @@ export async function postLog(
   content: string,
   opts: PostLogOptions = {},
 ): Promise<APILog> {
-  const res = await api.post(`log`, {
-    json: {
-      content: content.substring(0, limits.maxLength),
-      ...opts,
-    },
-  }).json(LogResults);
+  const res = await api
+    .post(`log`, {
+      json: {
+        content: content.substring(0, limits.maxLength),
+        ...opts,
+      },
+    })
+    .json(LogResults);
   if (!res.success) throw new Error(res.error);
 
   logCache.set(res.id, res);
@@ -179,9 +180,11 @@ export async function getLog<
     }
   }
 
-  const res = await api.get(`log/${id}`, {
-    searchParams: opts as Record<string, boolean>,
-  }).json(LogResults);
+  const res = await api
+    .get(`log/${id}`, {
+      searchParams: opts as Record<string, boolean>,
+    })
+    .json(LogResults);
   if (!res.success) throw new Error(res.error);
 
   // In case of race condition

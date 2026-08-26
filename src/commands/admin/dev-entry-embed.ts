@@ -37,7 +37,7 @@ export class UserCommand extends Command {
     registry.registerChatInputCommand((builder) =>
       builder //
         .setName(this.name)
-        .setDescription(this.description)
+        .setDescription(this.description),
     );
   }
 

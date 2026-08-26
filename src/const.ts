@@ -50,11 +50,11 @@ export const EmojiIDs = {} as const;
 export const AEmojiIDs = {} as const;
 
 const emojiMap = mapValues(EmojiIDs, (v) => formatEmoji(v)) as {
-  -readonly [K in keyof typeof EmojiIDs]: `<:emoji:${typeof EmojiIDs[K]}>`;
+  -readonly [K in keyof typeof EmojiIDs]: `<:emoji:${(typeof EmojiIDs)[K]}>`;
 };
 
 const aEmojiMap = mapValues(AEmojiIDs, (v) => formatEmoji(v, true)) as {
-  -readonly [K in keyof typeof AEmojiIDs]: `<a:emoji:${typeof AEmojiIDs[K]}>`;
+  -readonly [K in keyof typeof AEmojiIDs]: `<a:emoji:${(typeof AEmojiIDs)[K]}>`;
 };
 
 export const Emojis = {

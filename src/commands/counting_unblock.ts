@@ -76,8 +76,8 @@ export class UserCommand extends Command {
       });
     }
 
-    const reason = interaction.options.getString("reason") ||
-      "No reason provided";
+    const reason =
+      interaction.options.getString("reason") || "No reason provided";
     const embed = new EmbedBuilder()
       .setColor("Green")
       .setTitle("Unblocked from Counting")
