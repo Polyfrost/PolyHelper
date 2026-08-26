@@ -1,7 +1,6 @@
-# skyanswers
+# PolyHelper
 
-a bot to do misc things in the SkyClient server, originally intended to only
-answer tickets, but extended to replace another bot
+a bot to do misc things for the Polyfrost server
 
 ## running
 

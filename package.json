@@ -1,7 +1,7 @@
 {
-  "name": "skyanswers",
+  "name": "polyhelper",
   "main": "src/index.ts",
-  "author": "SkyClient",
+  "author": "Polyfrost",
   "type": "module",
   "dependencies": {
     "@octokit/core": "^7.0.6",
