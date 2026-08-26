@@ -91,18 +91,6 @@ async function expireTicket(ticket: TextChannel) {
         const oneHr = new Duration("1h").dateFrom(lastPing.createdAt);
         if (oneHr < new Date()) return;
       }
-
-      const ownerId = await getTicketOwner(ticket);
-      if (ownerId) {
-        const owner = ticket.guild.members.resolve(ownerId);
-        if (!owner) {
-          return void pingStaff(
-            ticket,
-            dedent`Owner left. Please close ticket.
-            (I don't have hands to do it myself...)`,
-          );
-        }
-      }
     } else if (isBumpMessage(lastMsg)) {
       const twoDays = new Duration("2d").dateFrom(lastMsg.createdAt);
       if (twoDays < new Date()) return void pingStaff(ticket, "Time to close");
