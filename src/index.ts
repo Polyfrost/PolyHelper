@@ -53,7 +53,6 @@ consola.success("Connected");
 
 declare module "@skyra/env-utilities" {
   interface Env {
-    DB_DIR: string;
     GH_KEY: string;
     SB_KEY: string;
   }
