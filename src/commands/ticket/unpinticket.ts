@@ -2,7 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { MessageFlags } from "discord.js";
 import {
-  findDoNotCloseChannel,
+  findNormalTicketCategory,
   isPinned,
   isSupportTeam,
   isTicket,
@@ -43,15 +43,15 @@ export class UserCommand extends Command {
         content: "This ticket is not pinned",
       });
     }
-    const doNotCloseChannel = findDoNotCloseChannel(channel);
-    if (!doNotCloseChannel) {
+    const normalTicketCategory = await findNormalTicketCategory(channel);
+    if (!normalTicketCategory) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "Could not find the do-not-close channel...",
+        content: "Could not find the *normal* category for this ticket type...",
       });
     }
 
-    await channel.setPosition(doNotCloseChannel.position + 0.5);
+    await channel.setParent(normalTicketCategory);
 
     channel.messages
       .fetchPins()

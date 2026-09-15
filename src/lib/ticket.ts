@@ -6,7 +6,13 @@ import {
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
 import consola from "consola";
-import { Message, roleMention, TextChannel } from "discord.js";
+import {
+  CategoryChannel,
+  ChannelType,
+  Message,
+  roleMention,
+  TextChannel,
+} from "discord.js";
 import pMemoize from "p-memoize";
 import { DevServer, Polyfrost, SupportTeams } from "../const.ts";
 import { formatChannel } from "./logHelper.ts";
@@ -110,19 +116,35 @@ export function isStaffPing(msg: Message) {
   );
 }
 
-export function findDoNotCloseChannel(
+export async function findNormalTicketCategory(
   channel: TextChannel,
-): TextChannel | undefined {
-  return channel.parent?.children
-    .valueOf()
-    .find(
-      (channel): channel is TextChannel =>
-        channel.name == "do-not-close" && isTextChannel(channel),
-    );
+): Promise<CategoryChannel | undefined> {
+  const parentChannelName = channel.parent?.name;
+  if (!parentChannelName) return;
+  return await channel.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type === ChannelType.GuildCategory)
+      .filter(
+        (category) =>
+          category.name === parentChannelName.replaceAll("pinned-", ""),
+      )
+      .first(),
+  );
 }
 
-export function isPinned(channel: TextChannel): boolean {
-  const doNotCloseChannel = findDoNotCloseChannel(channel);
-  if (!doNotCloseChannel) return false;
-  return channel.position < doNotCloseChannel.position;
+export async function findPinnedTicketCategory(
+  channel: TextChannel,
+): Promise<CategoryChannel | undefined> {
+  const parentChannelName = channel.parent?.name;
+  if (!parentChannelName) return;
+  return await channel.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type === ChannelType.GuildCategory)
+      .filter((category) => category.name === `pinned-${parentChannelName}`)
+      .first(),
+  );
+}
+
+export function isPinned(channel: TextChannel) {
+  return channel.parent?.name.startsWith("pinned-") ?? false;
 }
