@@ -4,7 +4,7 @@
   "author": "Polyfrost",
   "type": "module",
   "dependencies": {
-    "@octokit/core": "^7.0.7",
+    "@octokit/core": "^7.0.8",
     "@octokit/rest": "^22.0.1",
     "@sapphire/decorators": "^6.2.0",
     "@sapphire/discord.js-utilities": "^7.3.3",
@@ -21,14 +21,14 @@
     "@std/text": "npm:@jsr/std__text@^1.0.19",
     "consola": "^3.4.2",
     "discord.js": "^14.27.0",
-    "es-toolkit": "^1.51.0",
+    "es-toolkit": "^1.52.0",
     "expiry-map": "^2.0.0",
-    "jszip": "^3.10.1",
-    "ky": "^2.0.2",
+    "jszip": "^3.10.2",
+    "ky": "^2.1.0",
     "lowdb": "^7.0.1",
     "p-memoize": "^8.0.0",
     "prettier": "^3.9.6",
-    "zod": "^4.4.3"
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@sapphire/cli": "^1.9.3"
