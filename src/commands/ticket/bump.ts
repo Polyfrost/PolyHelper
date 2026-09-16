@@ -2,10 +2,9 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { MessageBuilder } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
 import { Duration } from "@sapphire/time-utilities";
-import { Colors, hyperlink, MessageFlags, time } from "discord.js";
+import { Colors, MessageFlags, time } from "discord.js";
 import {
   getTicketOwner,
-  getTicketTop,
   isPinned,
   isSupportTeam,
   isTicket,
@@ -32,28 +31,24 @@ export class UserCommand extends Command {
         content: "❔",
       });
     }
-    if (!isTicket(channel)) {
+
+    if (!isTicket(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
-    }
-    if (await isPinned(channel)) {
+
+    if (isPinned(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "This ticket is pinned. Please unpin it before bumping",
       });
-    }
 
-    const pinMsg = await getTicketTop(channel);
     const owner = await getTicketOwner(channel);
 
     const twoDays = new Duration("2d").fromNow;
     const twoDaysStamp = time(twoDays, "R");
 
-    const pinnedMsg = pinMsg
-      ? hyperlink("pinned message", pinMsg.url)
-      : "pinned message";
     const message = new MessageBuilder({
       embeds: [
         {

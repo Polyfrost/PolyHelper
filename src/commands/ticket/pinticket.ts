@@ -2,7 +2,7 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { MessageFlags } from "discord.js";
 import {
-  findDoNotCloseChannel,
+  findPinnedCategory,
   isPinned,
   isSupportTeam,
   isTicket,
@@ -26,37 +26,34 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    const { channel } = interaction;
+    const { channel, guild } = interaction;
+    if (!guild) return;
     if (!isSupportTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
     }
-    if (!isTicket(channel)) {
+    if (!isTicket(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
-    }
-    const doNotCloseChannel = findDoNotCloseChannel(channel);
-    if (!doNotCloseChannel) {
+
+    if (isPinned(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "Could not find the do-not-close channel...",
+        content: "**This ticket is already pinned.**",
       });
-    }
 
-    const pinned = isPinned(channel);
-    await channel.setPosition(doNotCloseChannel.position);
-
-    if (pinned) {
+    const newCat = await findPinnedCategory(channel);
+    if (!newCat)
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content:
-          "**This ticket is already pinned.**\nTicket has been pushed to the bottom of the pinned section.",
+        content: "Could not find the pinned category for this ticket type...",
       });
-    }
+    await channel.setParent(newCat);
+
     return interaction
       .reply(PINNED_TICKET_MESSAGE)
       .then((message) => message.fetch().then((message) => message.pin()));

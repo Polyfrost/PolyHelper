@@ -6,7 +6,13 @@ import {
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
 import consola from "consola";
-import { Message, roleMention, TextChannel } from "discord.js";
+import {
+  CategoryChannel,
+  ChannelType,
+  Message,
+  roleMention,
+  TextChannel,
+} from "discord.js";
 import pMemoize from "p-memoize";
 import { DevServer, Polyfrost, SupportTeams } from "../const.ts";
 import { formatChannel } from "./logHelper.ts";
@@ -110,19 +116,70 @@ export function isStaffPing(msg: Message) {
   );
 }
 
-export function findDoNotCloseChannel(
-  channel: TextChannel,
-): TextChannel | undefined {
-  return channel.parent?.children
-    .valueOf()
-    .find(
-      (channel): channel is TextChannel =>
-        channel.name == "do-not-close" && isTextChannel(channel),
-    );
+export const PINNED_PREFIX = "[📌] ";
+export const OVERFLOW_SUFFIX = " [2]";
+
+export function isPinned(arg1: TextChannel | CategoryChannel): boolean {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  return cat?.name.startsWith(PINNED_PREFIX) ?? false;
+}
+export async function findPinnedCategory(
+  arg1: TextChannel | CategoryChannel,
+): Promise<CategoryChannel | undefined> {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return;
+  if (isPinned(cat)) return cat;
+  const name = PINNED_PREFIX + normalizeCatName(cat.name);
+  return await cat.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type == ChannelType.GuildCategory)
+      .filter((category) => category.name == name)
+      .first(),
+  );
 }
 
-export function isPinned(channel: TextChannel): boolean {
-  const doNotCloseChannel = findDoNotCloseChannel(channel);
-  if (!doNotCloseChannel) return false;
-  return channel.position < doNotCloseChannel.position;
+export function isOverflow(arg1: TextChannel | CategoryChannel): boolean {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  return cat?.name.endsWith(OVERFLOW_SUFFIX) ?? false;
+}
+export async function findOverflowCategory(
+  arg1: TextChannel | CategoryChannel,
+): Promise<CategoryChannel | undefined> {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return;
+  if (isOverflow(cat)) return cat;
+  const name = normalizeCatName(cat.name) + OVERFLOW_SUFFIX;
+  return await cat.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type == ChannelType.GuildCategory)
+      .filter((category) => category.name == name)
+      .first(),
+  );
+}
+
+export function isRegularCat(arg1: TextChannel | CategoryChannel): boolean {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return false;
+  return !isPinned(arg1) && !isOverflow(arg1);
+}
+export async function findRegularCategory(
+  arg1: TextChannel | CategoryChannel,
+): Promise<CategoryChannel | undefined> {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return;
+  if (isRegularCat(cat)) return cat;
+  const name = normalizeCatName(cat.name);
+  return await cat.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type == ChannelType.GuildCategory)
+      .filter((category) => category.name == name)
+      .first(),
+  );
+}
+
+export function normalizeCatName(name: string) {
+  if (name.startsWith(PINNED_PREFIX)) name = name.slice(PINNED_PREFIX.length);
+  if (name.endsWith(OVERFLOW_SUFFIX))
+    name = name.slice(0, -OVERFLOW_SUFFIX.length);
+  return name;
 }
