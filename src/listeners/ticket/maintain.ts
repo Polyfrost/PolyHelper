@@ -3,9 +3,8 @@ import { container, Events, Listener } from "@sapphire/framework";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { Duration, Time } from "@sapphire/time-utilities";
 import consola from "consola";
-import { dedent } from "es-toolkit";
+import { dedent, forEachAsync } from "es-toolkit";
 import { DiscordAPIError, roleMention, TextChannel } from "discord.js";
-import pMap from "p-map";
 import { SupportTeams, Users } from "../../const.ts";
 import {
   getTicketOwner,
@@ -27,14 +26,16 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
 
     const stopwatch = new Stopwatch();
     // We want the bot to prefetch and cache ticket information.
-    await pMap(tickets, getTicketOwner);
+    await forEachAsync(tickets, async (ticket) => {
+      await getTicketOwner(ticket);
+    });
     consola.success(
       `Pre-cached ${tickets.length} tickets.`,
       `Took ${stopwatch.stop()}.`,
     );
 
     stopwatch.restart();
-    await pMap(
+    await forEachAsync(
       tickets,
       async (ticket) => {
         await pinTop(ticket);
@@ -45,10 +46,9 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
     );
     consola.success(`First ticket maintainance took ${stopwatch.stop()}.`);
 
-    setInterval(() => {
-      getTickets().then((tickets) =>
-        pMap(tickets, expireTicket, { concurrency: 3 }),
-      );
+    setInterval(async () => {
+      const tickets = await getTickets();
+      forEachAsync(tickets, expireTicket, { concurrency: 3 });
     }, Time.Second * 30);
   }
 }
