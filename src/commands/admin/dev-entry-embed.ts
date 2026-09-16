@@ -1,7 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { isTextBasedChannel } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
-import dedent from "dedent";
+import { dedent } from "es-toolkit";
 import {
   ButtonBuilder,
   ButtonStyle,

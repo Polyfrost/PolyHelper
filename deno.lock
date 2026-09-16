@@ -19,7 +19,6 @@
     "npm:@sapphire/utilities@^3.18.2": "3.18.2",
     "npm:@skyra/env-utilities@^2.0.1": "2.0.1",
     "npm:consola@^3.4.2": "3.4.2",
-    "npm:dedent@^1.7.2": "1.7.2",
     "npm:discord.js@^14.27.0": "14.27.0",
     "npm:es-toolkit@^1.51.0": "1.51.0",
     "npm:expiry-map@2": "2.0.0",
@@ -417,9 +416,6 @@
         "which"
       ]
     },
-    "dedent@1.7.2": {
-      "integrity": "sha512-WzMx3mW98SN+zn3hgemf4OzdmyNhhhKz5Ay0pUfQiMQ3e1g+xmTJWp/pKdwKVXhdSkAEGIIzqeuWrL3mV/AXbA=="
-    },
     "discord-api-types@0.38.53": {
       "integrity": "sha512-HL1zz/UuZ+bbJjA/X8Kbxx9gk8v9rJAbTeWRNYKmIdjwJ7EovjlHgoJTxcLpATfNJ+AonOtMdy3Y5MVIJAAd/A=="
     },
@@ -737,7 +733,6 @@
         "npm:@sapphire/utilities@^3.18.2",
         "npm:@skyra/env-utilities@^2.0.1",
         "npm:consola@^3.4.2",
-        "npm:dedent@^1.7.2",
         "npm:discord.js@^14.27.0",
         "npm:es-toolkit@^1.51.0",
         "npm:expiry-map@2",

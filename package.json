@@ -20,7 +20,6 @@
     "@std/fmt": "npm:@jsr/std__fmt@^1.0.10",
     "@std/text": "npm:@jsr/std__text@^1.0.19",
     "consola": "^3.4.2",
-    "dedent": "^1.7.2",
     "discord.js": "^14.27.0",
     "es-toolkit": "^1.51.0",
     "expiry-map": "^2.0.0",

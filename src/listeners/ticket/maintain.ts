@@ -3,6 +3,7 @@ import { container, Events, Listener } from "@sapphire/framework";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { Duration, Time } from "@sapphire/time-utilities";
 import consola from "consola";
+import { dedent } from "es-toolkit";
 import { DiscordAPIError, roleMention, TextChannel } from "discord.js";
 import pMap from "p-map";
 import { SupportTeams, Users } from "../../const.ts";
@@ -46,7 +47,7 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
 
     setInterval(() => {
       getTickets().then((tickets) =>
-        pMap(tickets, expireTicket, { concurrency: 3 }),
+        pMap(tickets, expireTicket, { concurrency: 3 })
       );
     }, Time.Second * 30);
   }
@@ -90,12 +91,25 @@ async function expireTicket(ticket: TextChannel) {
         const oneHr = new Duration("1h").dateFrom(lastPing.createdAt);
         if (oneHr < new Date()) return;
       }
+
+      const ownerId = await getTicketOwner(ticket);
+      if (ownerId) {
+        const owner = ticket.guild.members.resolve(ownerId);
+        if (!owner) {
+          return void pingStaff(
+            ticket,
+            dedent`Owner left. Please close ticket.
+            (I don't have hands to do it myself...)`,
+          );
+        }
+      }
     } else if (isBumpMessage(lastMsg)) {
       const twoDays = new Duration("2d").dateFrom(lastMsg.createdAt);
       if (twoDays < new Date()) return void pingStaff(ticket, "Time to close");
     }
   } catch (e) {
-    const header = `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
+    const header =
+      `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
       if (e.code == 50001) return;
       consola.error(header, e.code, e.message);
@@ -112,7 +126,8 @@ export async function pinTop(ticket: TextChannel) {
     if (!top || top.pinned) return;
     await top.pin();
   } catch (e) {
-    const header = `Failed to pin ticket top in ${ticket.name} in ${ticket.guild.name}:`;
+    const header =
+      `Failed to pin ticket top in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
       if (e.code == 50001) return;
       consola.error(header, e.code, e.message);
