@@ -2,10 +2,9 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { MessageFlags } from "discord.js";
 import {
-  findNormalTicketCategory,
-  isPinned,
+  getTicketInfo,
   isSupportTeam,
-  isTicket,
+  TicketInfoFail,
 } from "../../lib/ticket.ts";
 import { PINNED_TICKET_MESSAGE } from "./pinticket.ts";
 
@@ -24,36 +23,45 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    const { channel } = interaction;
     if (!isSupportTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
     }
-    if (!isTicket(channel)) {
+    const ticketInfo = await getTicketInfo(interaction.channel);
+    if (ticketInfo === TicketInfoFail.NotATicket) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
     }
-    if (!isPinned(channel)) {
+
+    if (ticketInfo === TicketInfoFail.NoParent) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
-        content: "This ticket is not pinned",
-      });
-    }
-    const normalTicketCategory = await findNormalTicketCategory(channel);
-    if (!normalTicketCategory) {
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: "Could not find the *normal* category for this ticket type...",
+        content:
+          "Could not find the parent category for this channel. Is this a ticket?",
       });
     }
 
-    await channel.setParent(normalTicketCategory);
+    if (ticketInfo === TicketInfoFail.CouldNotFindPrimary) {
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "Could not find the primary category. Is this a ticket?",
+      });
+    }
 
-    channel.messages
+    if (!ticketInfo.pinned) {
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "This ticket is not pinned...",
+      });
+    }
+
+    await ticketInfo.channel.setParent(ticketInfo.categories.primary);
+
+    ticketInfo.channel.messages
       .fetchPins()
       .then((messages) => messages.items.map((message) => message.message))
       .then((messages) =>

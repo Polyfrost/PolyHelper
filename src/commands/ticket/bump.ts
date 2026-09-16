@@ -4,11 +4,11 @@ import { Command } from "@sapphire/framework";
 import { Duration } from "@sapphire/time-utilities";
 import { Colors, hyperlink, MessageFlags, time } from "discord.js";
 import {
+  getTicketInfo,
   getTicketOwner,
   getTicketTop,
-  isPinned,
   isSupportTeam,
-  isTicket,
+  TicketInfoFail,
 } from "../../lib/ticket.ts";
 
 @ApplyOptions<Command.Options>({
@@ -25,20 +25,37 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
-    const { channel } = interaction;
     if (!isSupportTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
     }
-    if (!isTicket(channel)) {
+    const ticketInfo = await getTicketInfo(interaction.channel);
+    if (ticketInfo === TicketInfoFail.NotATicket) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
     }
-    if (await isPinned(channel)) {
+
+    if (ticketInfo === TicketInfoFail.NoParent) {
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content:
+          "Could not find the parent category for this channel. Is this a ticket?",
+      });
+    }
+
+    if (ticketInfo === TicketInfoFail.CouldNotFindPrimary) {
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "Could not find the primary category. Is this a ticket?",
+      });
+    }
+
+    const { channel, pinned } = ticketInfo;
+    if (pinned) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "This ticket is pinned. Please unpin it before bumping",
