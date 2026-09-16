@@ -1,6 +1,6 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
-import dedent from "dedent";
+import { dedent } from "es-toolkit";
 import { ApplicationCommandOptionType } from "discord.js";
 import { isSupportTeam } from "../lib/ticket.ts";
 

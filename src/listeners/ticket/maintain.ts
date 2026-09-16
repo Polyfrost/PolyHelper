@@ -3,7 +3,7 @@ import { container, Events, Listener } from "@sapphire/framework";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { Duration, Time } from "@sapphire/time-utilities";
 import consola from "consola";
-import dedent from "dedent";
+import { dedent } from "es-toolkit";
 import { DiscordAPIError, roleMention, TextChannel } from "discord.js";
 import pMap from "p-map";
 import { SupportTeams, Users } from "../../const.ts";
