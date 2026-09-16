@@ -3,18 +3,16 @@ import { container, Events, Listener } from "@sapphire/framework";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { Duration, Time } from "@sapphire/time-utilities";
 import consola from "consola";
-import dedent from "dedent";
 import { DiscordAPIError, roleMention, TextChannel } from "discord.js";
 import pMap from "p-map";
 import { SupportTeams, Users } from "../../const.ts";
 import {
-  getTicketInfo,
   getTicketOwner,
   getTicketTop,
   isBumpMessage,
+  isPinned,
   isStaffPing,
   isTicket,
-  isTicketInfoFail,
 } from "../../lib/ticket.ts";
 import { expireBumps } from "./expireBumps.ts";
 
@@ -77,9 +75,7 @@ async function expireTicket(ticket: TextChannel) {
   try {
     const support = SupportTeams[ticket.guildId];
     if (!support) return;
-    const ticketInfo = await getTicketInfo(ticket);
-    if (isTicketInfoFail(ticketInfo)) return;
-    if (ticketInfo.pinned) return;
+    if (isPinned(ticket)) return;
 
     const messages = await ticket.messages.fetch();
     const lastMsg = messages

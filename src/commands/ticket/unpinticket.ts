@@ -2,9 +2,11 @@ import { ApplyOptions } from "@sapphire/decorators";
 import { Command } from "@sapphire/framework";
 import { MessageFlags } from "discord.js";
 import {
-  getTicketInfo,
+  findOverflowCategory,
+  findRegularCategory,
+  isPinned,
   isSupportTeam,
-  TicketInfoFail,
+  isTicket,
 } from "../../lib/ticket.ts";
 import { PINNED_TICKET_MESSAGE } from "./pinticket.ts";
 
@@ -23,45 +25,51 @@ export class UserCommand extends Command {
   public override async chatInputRun(
     interaction: Command.ChatInputCommandInteraction,
   ) {
+    const { channel } = interaction;
     if (!isSupportTeam(interaction.member)) {
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "❔",
       });
     }
-    const ticketInfo = await getTicketInfo(interaction.channel);
-    if (ticketInfo === TicketInfoFail.NotATicket) {
+    if (!isTicket(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "Bold of you to assume this is a ticket...",
       });
-    }
 
-    if (ticketInfo === TicketInfoFail.NoParent) {
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content:
-          "Could not find the parent category for this channel. Is this a ticket?",
-      });
-    }
-
-    if (ticketInfo === TicketInfoFail.CouldNotFindPrimary) {
-      return interaction.reply({
-        flags: MessageFlags.Ephemeral,
-        content: "Could not find the primary category. Is this a ticket?",
-      });
-    }
-
-    if (!ticketInfo.pinned) {
+    if (!isPinned(channel))
       return interaction.reply({
         flags: MessageFlags.Ephemeral,
         content: "This ticket is not pinned...",
       });
-    }
 
-    await ticketInfo.channel.setParent(ticketInfo.categories.primary);
+    let newCat = await findRegularCategory(channel);
 
-    ticketInfo.channel.messages
+    if (!newCat)
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content: "Could not find the regular category for this ticket type...",
+      });
+    if (newCat.children.cache.size >= 50)
+      newCat = await findOverflowCategory(channel);
+
+    if (!newCat)
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content:
+          "The regular category for this ticket type is full and there's no overflow category!",
+      });
+    if (newCat.children.cache.size >= 50)
+      return interaction.reply({
+        flags: MessageFlags.Ephemeral,
+        content:
+          "Both the regular and overflow categories for this ticket type are full!",
+      });
+
+    await channel.setParent(newCat);
+
+    channel.messages
       .fetchPins()
       .then((messages) => messages.items.map((message) => message.message))
       .then((messages) =>

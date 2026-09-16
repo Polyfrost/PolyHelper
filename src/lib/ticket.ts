@@ -9,10 +9,7 @@ import consola from "consola";
 import {
   CategoryChannel,
   ChannelType,
-  Collection,
-  Guild,
   Message,
-  PermissionOverwrites,
   roleMention,
   TextChannel,
 } from "discord.js";
@@ -119,91 +116,70 @@ export function isStaffPing(msg: Message) {
   );
 }
 
-export const PINNED_PREFIX = "[pinned]_";
-export const OVERFLOW_SUFFIX = "_[overflow]";
+export const PINNED_PREFIX = "[📌] ";
+export const OVERFLOW_SUFFIX = " [2]";
 
-export function _isTicketPinned(channel: TextChannel): boolean {
-  return channel.parent?.name.startsWith(PINNED_PREFIX) ?? false;
+export function isPinned(arg1: TextChannel | CategoryChannel): boolean {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  return cat?.name.startsWith(PINNED_PREFIX) ?? false;
 }
-
-export interface TicketInfoCategories {
-  pinned: CategoryChannel;
-  primary: CategoryChannel;
-  overflow: CategoryChannel;
-}
-
-export interface TicketInfo {
-  channel: TextChannel;
-  pinned: boolean;
-  categories: TicketInfoCategories;
-}
-
-export enum TicketInfoFail {
-  NoParent,
-  NotATicket,
-  CouldNotFindPrimary,
-}
-
-export async function _createTicketCategory(
-  name: string,
-  guild: Guild,
-  permissionOverwrites: Collection<string, PermissionOverwrites>,
-): Promise<CategoryChannel> {
-  return await guild.channels.create({
-    name,
-    type: ChannelType.GuildCategory,
-    permissionOverwrites,
-  });
-}
-
-export async function getTicketInfo(
-  channel: ChannelTypes | Nullish,
-): Promise<TicketInfo | TicketInfoFail> {
-  if (!isTextChannel(channel)) return TicketInfoFail.NotATicket;
-  const parentChannelName = channel.parent?.name
-    .replaceAll(PINNED_PREFIX, "")
-    .replaceAll(OVERFLOW_SUFFIX, "");
-  if (!parentChannelName) return TicketInfoFail.NoParent;
-  if (!isTicket(channel)) return TicketInfoFail.NotATicket;
-  const pinned = _isTicketPinned(channel);
-  const categories = await channel.guild.channels
-    .fetch()
-    .then((channels) =>
-      channels
-        .filter((channel) => channel?.type === ChannelType.GuildCategory)
-        .filter((category) => category.name.includes(parentChannelName)),
-    );
-
-  const primary = categories.find(
-    (channel) => channel.name === parentChannelName,
+export async function findPinnedCategory(
+  arg1: TextChannel | CategoryChannel,
+): Promise<CategoryChannel | undefined> {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return;
+  if (isPinned(cat)) return cat;
+  const name = PINNED_PREFIX + normalizeCatName(cat.name);
+  return await cat.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type == ChannelType.GuildCategory)
+      .filter((category) => category.name == name)
+      .first(),
   );
-  if (!primary) return TicketInfoFail.CouldNotFindPrimary;
-
-  const pinnedCategory =
-    categories.find((channel) => channel.name.startsWith(PINNED_PREFIX)) ??
-    (await _createTicketCategory(
-      PINNED_PREFIX + parentChannelName,
-      channel.guild,
-      primary.permissionOverwrites.cache,
-    ));
-
-  const overflow =
-    categories.find((channel) => channel.name.endsWith(OVERFLOW_SUFFIX)) ??
-    (await _createTicketCategory(
-      parentChannelName + OVERFLOW_SUFFIX,
-      channel.guild,
-      primary.permissionOverwrites.cache,
-    ));
-
-  return {
-    channel,
-    pinned,
-    categories: { pinned: pinnedCategory, primary, overflow },
-  };
 }
 
-export function isTicketInfoFail(
-  value: TicketInfo | TicketInfoFail,
-): value is TicketInfoFail {
-  return Object.values(TicketInfoFail).includes(value as TicketInfoFail);
+export function isOverflow(arg1: TextChannel | CategoryChannel): boolean {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  return cat?.name.endsWith(OVERFLOW_SUFFIX) ?? false;
+}
+export async function findOverflowCategory(
+  arg1: TextChannel | CategoryChannel,
+): Promise<CategoryChannel | undefined> {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return;
+  if (isOverflow(cat)) return cat;
+  const name = normalizeCatName(cat.name) + OVERFLOW_SUFFIX;
+  return await cat.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type == ChannelType.GuildCategory)
+      .filter((category) => category.name == name)
+      .first(),
+  );
+}
+
+export function isRegularCat(arg1: TextChannel | CategoryChannel): boolean {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return false;
+  return !isPinned(arg1) && !isOverflow(arg1);
+}
+export async function findRegularCategory(
+  arg1: TextChannel | CategoryChannel,
+): Promise<CategoryChannel | undefined> {
+  const cat = arg1 instanceof TextChannel ? arg1.parent : arg1;
+  if (!cat) return;
+  if (isRegularCat(cat)) return cat;
+  const name = normalizeCatName(cat.name);
+  return await cat.guild.channels.fetch().then((channels) =>
+    channels
+      .filter((channel) => channel?.type == ChannelType.GuildCategory)
+      .filter((category) => category.name == name)
+      .first(),
+  );
+}
+
+export function normalizeCatName(name: string) {
+  if (name.startsWith(PINNED_PREFIX)) name = name.slice(PINNED_PREFIX.length);
+  if (name.endsWith(OVERFLOW_SUFFIX))
+    name = name.slice(0, -OVERFLOW_SUFFIX.length);
+  return name;
 }

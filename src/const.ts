@@ -27,9 +27,6 @@ export const Polyfrost = {
     NoCounting: "1116377446393057280",
     ModTeam: "822070886223052841",
     PolyTeam: "982578079673245726",
-    Staff: "982578911407923231",
-    Developer: "942825179925594162",
-    Designer: "982577862739640340",
   },
 } as const;
 

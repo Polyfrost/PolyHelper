@@ -2,7 +2,7 @@
   "tasks": {
     "generate": "deno x sapphire generate",
     "start": "deno -A src/index.ts",
-    "check": "deno check && deno fmt && deno lint"
+    "check": "deno check && deno x prettier -c . && deno lint"
   },
   "nodeModulesDir": "auto",
   "jsrDepsInNodeModules": true,
