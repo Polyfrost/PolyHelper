@@ -99,7 +99,10 @@ async function expireTicket(ticket: TextChannel) {
 
     const ownerId = await getTicketOwner(ticket);
     if (ownerId) {
-      const owner = await ticket.guild.members.fetch(ownerId);
+      const owner = await ticket.guild.members.fetch(ownerId).catch((e) => {
+        if (e instanceof DiscordAPIError && e.code == 10007) return null;
+        throw e;
+      });
       if (!owner)
         return void pingStaff(
           ticket,
