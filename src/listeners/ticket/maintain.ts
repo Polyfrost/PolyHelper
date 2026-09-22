@@ -84,28 +84,28 @@ async function expireTicket(ticket: TextChannel) {
       .first();
     if (!lastMsg) return;
 
-    if (isStaffPing(lastMsg)) {
-      const lastPing = messages.filter(isStaffPing).first();
-      if (lastPing) {
-        // Don't ping again if the last ping was less than an hour ago
-        const expireDate = new Duration("1h").dateFrom(lastPing.createdAt);
-        if (expireDate > new Date()) return;
-      }
+    if (isBumpMessage(lastMsg)) {
+      const expireDate = new Duration("2d").dateFrom(lastMsg.createdAt);
+      if (expireDate < new Date())
+        return void pingStaff(ticket, "Time to close");
+    }
 
-      const ownerId = await getTicketOwner(ticket);
-      if (ownerId) {
-        const owner = ticket.guild.members.resolve(ownerId);
-        if (!owner) {
-          return void pingStaff(
-            ticket,
-            dedent`Owner left. Please close ticket.
+    const lastPing = messages.filter(isStaffPing).first();
+    if (lastPing) {
+      // Don't ping again if the last ping was less than an hour ago
+      const expireDate = new Duration("1h").dateFrom(lastPing.createdAt);
+      if (expireDate > new Date()) return;
+    }
+
+    const ownerId = await getTicketOwner(ticket);
+    if (ownerId) {
+      const owner = ticket.guild.members.resolve(ownerId);
+      if (!owner)
+        return void pingStaff(
+          ticket,
+          dedent`Owner left. Please close ticket.
             (I don't have hands to do it myself...)`,
-          );
-        }
-      }
-    } else if (isBumpMessage(lastMsg)) {
-      const twoDays = new Duration("2d").dateFrom(lastMsg.createdAt);
-      if (twoDays < new Date()) return void pingStaff(ticket, "Time to close");
+        );
     }
   } catch (e) {
     const header = `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
