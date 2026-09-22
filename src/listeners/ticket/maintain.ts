@@ -90,23 +90,23 @@ async function expireTicket(ticket: TextChannel) {
         return void pingStaff(ticket, "Time to close");
     }
 
-    // const lastPing = messages.filter(isStaffPing).first();
-    // if (lastPing) {
-    //   // Don't ping again if the last ping was less than an hour ago
-    //   const expireDate = new Duration("1h").dateFrom(lastPing.createdAt);
-    //   if (expireDate > new Date()) return;
-    // }
+    const lastPing = messages.filter(isStaffPing).first();
+    if (lastPing) {
+      // Don't ping again if the last ping was less than an hour ago
+      const expireDate = new Duration("1h").dateFrom(lastPing.createdAt);
+      if (expireDate > new Date()) return;
+    }
 
-    // const ownerId = await getTicketOwner(ticket);
-    // if (ownerId) {
-    //   const owner = ticket.guild.members.resolve(ownerId);
-    //   if (!owner)
-    //     return void pingStaff(
-    //       ticket,
-    //       dedent`Owner left. Please close ticket.
-    //         (I don't have hands to do it myself...)`,
-    //     );
-    // }
+    const ownerId = await getTicketOwner(ticket);
+    if (ownerId) {
+      const owner = await ticket.guild.members.fetch(ownerId);
+      if (!owner)
+        return void pingStaff(
+          ticket,
+          dedent`Owner left. Please close ticket.
+            (I don't have hands to do it myself...)`,
+        );
+    }
   } catch (e) {
     const header = `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
     if (e instanceof DiscordAPIError) {
