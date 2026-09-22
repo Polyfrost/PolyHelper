@@ -35,15 +35,11 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
     );
 
     stopwatch.restart();
-    await forEachAsync(
-      tickets,
-      async (ticket) => {
-        await pinTop(ticket);
-        await expireTicket(ticket);
-        await expireBumps(ticket);
-      },
-      { concurrency: 3 },
-    );
+    await forEachAsync(tickets, async (ticket) => {
+      await pinTop(ticket);
+      await expireTicket(ticket);
+      await expireBumps(ticket);
+    });
     consola.success(`First ticket maintainance took ${stopwatch.stop()}.`);
 
     setInterval(async () => {
