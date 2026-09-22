@@ -106,8 +106,10 @@ async function expireTicket(ticket: TextChannel) {
       if (!owner)
         return void pingStaff(
           ticket,
-          dedent`Owner left. Please close ticket.
-            (I don't have hands to do it myself...)`,
+          dedent`
+            Owner left. Please close ticket.
+            (I don't have hands to do it myself...)
+          `,
         );
     }
   } catch (e) {
