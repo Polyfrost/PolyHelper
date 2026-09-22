@@ -88,8 +88,8 @@ async function expireTicket(ticket: TextChannel) {
       const lastPing = messages.filter(isStaffPing).first();
       if (lastPing) {
         // Don't ping again if the last ping was less than an hour ago
-        const oneHr = new Duration("1h").dateFrom(lastPing.createdAt);
-        if (oneHr < new Date()) return;
+        const expireDate = new Duration("1h").dateFrom(lastPing.createdAt);
+        if (expireDate > new Date()) return;
       }
 
       const ownerId = await getTicketOwner(ticket);
