@@ -86,12 +86,16 @@ async function expireTicket(ticket: TextChannel) {
         return void pingStaff(ticket, "Time to close");
     }
 
-    const lastPing = messages.filter(isStaffPing).first();
-    if (lastPing) {
-      // Don't ping again if the last ping was less than an hour ago
-      const expireDate = new Duration("1h").dateFrom(lastPing.createdAt);
-      if (expireDate > new Date()) return;
-    }
+    const ownerLeftMsgs = messages.filter(
+      (v) =>
+        v.author.id == v.client.user.id &&
+        v.content.toLowerCase().includes("owner left"),
+    );
+    const ownerLeftMsg = ownerLeftMsgs.first();
+    const canSendNew =
+      !ownerLeftMsg ||
+      (ownerLeftMsg.id != lastMsg.id &&
+        new Date() > new Duration("1h").dateFrom(ownerLeftMsg.createdAt));
 
     const ownerId = await getTicketOwner(ticket);
     if (ownerId) {
@@ -99,14 +103,9 @@ async function expireTicket(ticket: TextChannel) {
         if (e instanceof DiscordAPIError && e.code == 10007) return null;
         throw e;
       });
-      if (!owner)
-        return void pingStaff(
-          ticket,
-          dedent`
-            Owner left. Please close ticket.
-            (I don't have hands to do it myself...)
-          `,
-        );
+      if (!owner && canSendNew)
+        return void ticket.send("owner left, please chase them down");
+      else if (owner) return void ownerLeftMsgs.each((msg) => msg.delete());
     }
   } catch (e) {
     const header = `Failed to maintain ticket in ${ticket.name} in ${ticket.guild.name}:`;
