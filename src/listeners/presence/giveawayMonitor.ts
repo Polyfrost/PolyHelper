@@ -26,6 +26,7 @@ const ignoredChannels = [
 /** Flags users who are spamming for giveaways */
 @ApplyOptions<Listener.Options>({
   event: Events.MessageCreate,
+  enabled: false,
 })
 export class MessageListener extends Listener<typeof Events.MessageCreate> {
   public override async run(message: Message) {
