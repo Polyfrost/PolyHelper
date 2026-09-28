@@ -3,18 +3,15 @@ import { container, Events, Listener } from "@sapphire/framework";
 import { Stopwatch } from "@sapphire/stopwatch";
 import { Duration, Time } from "@sapphire/time-utilities";
 import consola from "consola";
-import { dedent, forEachAsync } from "es-toolkit";
+import { forEachAsync } from "es-toolkit";
 import { DiscordAPIError, roleMention, TextChannel } from "discord.js";
 import { SupportTeams, Users } from "../../const.ts";
 import {
   getTicketOwner,
   getTicketTop,
-  isBumpMessage,
   isPinned,
-  isStaffPing,
   isTicket,
 } from "../../lib/ticket.ts";
-import { expireBumps } from "./expireBumps.ts";
 
 @ApplyOptions<Listener.Options>({
   once: true,
@@ -38,7 +35,6 @@ export class ReadyListener extends Listener<typeof Events.ClientReady> {
     await forEachAsync(tickets, async (ticket) => {
       await pinTop(ticket);
       await expireTicket(ticket);
-      await expireBumps(ticket);
     });
     consola.success(`First ticket maintainance took ${stopwatch.stop()}.`);
 
@@ -79,12 +75,6 @@ async function expireTicket(ticket: TextChannel) {
       .filter((message) => message.author.id != Users.TicketTool)
       .first();
     if (!lastMsg) return;
-
-    if (isBumpMessage(lastMsg)) {
-      const expireDate = new Duration("2d").dateFrom(lastMsg.createdAt);
-      if (expireDate < new Date())
-        return void pingStaff(ticket, "Time to close");
-    }
 
     const ownerLeftMsgs = messages.filter(
       (v) =>

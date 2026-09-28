@@ -5,37 +5,9 @@ import {
 } from "@sapphire/discord.js-utilities";
 import { Time } from "@sapphire/time-utilities";
 import { type FirstArgument, type Nullish, sleep } from "@sapphire/utilities";
-import consola from "consola";
-import {
-  CategoryChannel,
-  ChannelType,
-  Message,
-  roleMention,
-  TextChannel,
-} from "discord.js";
+import { CategoryChannel, ChannelType, Message, TextChannel } from "discord.js";
 import pMemoize from "p-memoize";
-import { DevServer, Polyfrost, SupportTeams } from "../const.ts";
-import { formatChannel } from "./logHelper.ts";
-
-export async function setTicketOpen(
-  channel: ChannelTypes,
-  open: boolean = true,
-) {
-  if (open == undefined || open == null) {
-    throw new Error(`open undefined WHY IS THIS HAPPENING`);
-  }
-  const header = `${open ? "Opening" : "Closing"} ${formatChannel(channel)}`;
-  if (!isTicket(channel)) {
-    consola.warn(header, "Not a ticket");
-    return;
-  }
-
-  const owner = await getTicketOwner(channel);
-  if (owner) {
-    consola.info(header, "for", owner);
-    await channel.permissionOverwrites.edit(owner, { SendMessages: open });
-  } else consola.warn(header, "Failed to find owner");
-}
+import { DevServer, Polyfrost } from "../const.ts";
 
 async function _getTicketTop(ticket: ChannelTypes) {
   if (!isTicket(ticket)) return;
@@ -98,21 +70,6 @@ export function isSupportTeam(member: FirstArgument<typeof isGuildMember>) {
       Polyfrost.roles.PolyTeam,
       DevServer.roles.SupportTeam,
     )
-  );
-}
-
-export const isBumpMessage = (msg: Message) =>
-  msg.author.id == msg.client.user.id &&
-  msg.embeds.some((embed) => embed.title == "Do you still need help?");
-
-export function isStaffPing(msg: Message) {
-  const { guild } = msg;
-  if (!guild) return false;
-  const support = SupportTeams[guild.id];
-  if (!support) return false;
-  return (
-    msg.author.id == msg.client.user.id &&
-    msg.content.startsWith(roleMention(support))
   );
 }
 

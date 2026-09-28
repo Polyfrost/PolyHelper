@@ -1,8 +1,7 @@
 import { ApplyOptions } from "@sapphire/decorators";
 import { MessageBuilder } from "@sapphire/discord.js-utilities";
 import { Command } from "@sapphire/framework";
-import { Duration } from "@sapphire/time-utilities";
-import { Colors, MessageFlags, time } from "discord.js";
+import { Colors, MessageFlags } from "discord.js";
 import {
   getTicketOwner,
   isPinned,
@@ -46,9 +45,6 @@ export class UserCommand extends Command {
 
     const owner = await getTicketOwner(channel);
 
-    const twoDays = new Duration("2d").fromNow;
-    const twoDaysStamp = time(twoDays, "R");
-
     const message = new MessageBuilder({
       embeds: [
         {
@@ -65,10 +61,6 @@ export class UserCommand extends Command {
               value: `__Let us know__ so we can close the ticket.`,
             },
           ],
-        },
-        {
-          description: `If you do not respond ${twoDaysStamp}, your ticket will be closed.`,
-          color: Colors.DarkRed,
         },
       ],
       allowedMentions: { users: owner ? [owner] : [] },
