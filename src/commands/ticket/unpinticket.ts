@@ -67,7 +67,7 @@ export class UserCommand extends Command {
           "Both the regular and overflow categories for this ticket type are full!",
       });
 
-    await channel.setParent(newCat);
+    await channel.setParent(newCat, { lockPermissions: false });
 
     channel.messages
       .fetchPins()
