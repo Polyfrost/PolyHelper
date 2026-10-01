@@ -52,7 +52,7 @@ export class UserCommand extends Command {
         flags: MessageFlags.Ephemeral,
         content: "Could not find the pinned category for this ticket type...",
       });
-    await channel.setParent(newCat);
+    await channel.setParent(newCat, { lockPermissions: false });
 
     return interaction
       .reply(PINNED_TICKET_MESSAGE)
